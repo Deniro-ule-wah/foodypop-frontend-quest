@@ -28,19 +28,33 @@ export const PAYMENT_CONTRACT_GAP =
 export function readPaymentState(value: unknown): PaymentState | null {
   const s = typeof value === "string" ? value.toUpperCase() : null;
   if (!s) return null;
-  return (["PENDING", "SUCCESS", "FAILED", "TIMEOUT", "UNKNOWN"] as const).includes(s as PaymentState)
+  return (["PENDING", "SUCCESS", "FAILED", "TIMEOUT", "UNKNOWN"] as const).includes(
+    s as PaymentState,
+  )
     ? (s as PaymentState)
     : null;
 }
 
-export function paymentStateCopy(state: PaymentState): { label: string; note: string; terminal: boolean } {
+export function paymentStateCopy(state: PaymentState): {
+  label: string;
+  note: string;
+  terminal: boolean;
+} {
   switch (state) {
     case "PENDING":
-      return { label: "Payment being processed", note: "Waiting for backend confirmation.", terminal: false };
+      return {
+        label: "Payment being processed",
+        note: "Waiting for backend confirmation.",
+        terminal: false,
+      };
     case "SUCCESS":
       return { label: "Payment confirmed", note: "Confirmed by the backend.", terminal: true };
     case "FAILED":
-      return { label: "Payment failed", note: "The backend recorded a failed attempt.", terminal: true };
+      return {
+        label: "Payment failed",
+        note: "The backend recorded a failed attempt.",
+        terminal: true,
+      };
     case "TIMEOUT":
       return {
         label: "Payment timed out",

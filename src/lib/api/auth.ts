@@ -14,26 +14,34 @@ export interface AuthResult {
 }
 
 /** The token field name is read defensively; the client never assumes one shape. */
+type Bag = Record<string, unknown>;
+
+function nested(p: Bag, key: string): Bag | null {
+  const v = p[key];
+  return v && typeof v === "object" ? (v as Bag) : null;
+}
+
 export function extractToken(payload: unknown): string | null {
   if (!payload || typeof payload !== "object") return null;
-  const p = payload as Record<string, any>;
-  const candidates = [
+  const p = payload as Bag;
+  const candidates: unknown[] = [
     p["accessToken"],
     p["token"],
     p["jwt"],
     p["access_token"],
-    p["data"]?.accessToken,
-    p["data"]?.token,
-    p["tokens"]?.accessToken,
-    p["session"]?.accessToken,
+    nested(p, "data")?.["accessToken"],
+    nested(p, "data")?.["token"],
+    nested(p, "tokens")?.["accessToken"],
+    nested(p, "session")?.["accessToken"],
   ];
-  return candidates.find((c) => typeof c === "string" && c.length > 0) ?? null;
+  const found = candidates.find((c) => typeof c === "string" && c.length > 0);
+  return typeof found === "string" ? found : null;
 }
 
 export function extractUser(payload: unknown): AuthUser | null {
   if (!payload || typeof payload !== "object") return null;
-  const p = payload as Record<string, any>;
-  return (p["user"] ?? p["data"]?.user ?? p["profile"] ?? null) as AuthUser | null;
+  const p = payload as Bag;
+  return (p["user"] ?? nested(p, "data")?.["user"] ?? p["profile"] ?? null) as AuthUser | null;
 }
 
 export async function login(input: { email: string; password: string }): Promise<AuthResult> {

@@ -11,9 +11,15 @@ export const Route = createFileRoute("/cart")({
   head: () => ({
     meta: [
       { title: "Cart — FoodyPop" },
-      { name: "description", content: "Your local FoodyPop cart, before any backend order is created." },
+      {
+        name: "description",
+        content: "Your local FoodyPop cart, before any backend order is created.",
+      },
       { property: "og:title", content: "Cart — FoodyPop" },
-      { property: "og:description", content: "Local cart and checkout against the FoodyPop V2 backend." },
+      {
+        property: "og:description",
+        content: "Local cart and checkout against the FoodyPop V2 backend.",
+      },
     ],
   }),
   component: CartPage,
@@ -50,7 +56,8 @@ function CartPage() {
       <header className="grid gap-2">
         <h1 className="text-3xl text-foreground">Cart</h1>
         <p className="text-sm text-muted-foreground">
-          This is <strong>local browser state</strong>. No backend order exists until the backend creates one.
+          This is <strong>local browser state</strong>. No backend order exists until the backend
+          creates one.
         </p>
       </header>
 
@@ -69,7 +76,9 @@ function CartPage() {
                   <p className="font-mono text-xs text-muted-foreground">{l.dishId}</p>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {l.unitPrice === null ? "Price not provided" : `${l.currency ?? "KES"} ${l.unitPrice.toLocaleString()}`}
+                  {l.unitPrice === null
+                    ? "Price not provided"
+                    : `${l.currency ?? "KES"} ${l.unitPrice.toLocaleString()}`}
                 </p>
                 <input
                   type="number"
@@ -79,7 +88,11 @@ function CartPage() {
                   value={l.quantity}
                   onChange={(e) => setQuantity(l.dishId, Number(e.target.value))}
                 />
-                <button type="button" className="btn-ghost text-sm" onClick={() => remove(l.dishId)}>
+                <button
+                  type="button"
+                  className="btn-ghost text-sm"
+                  onClick={() => remove(l.dishId)}
+                >
                   Remove
                 </button>
               </li>
@@ -90,7 +103,9 @@ function CartPage() {
             <p className="text-sm text-foreground">
               Subtotal:{" "}
               {subtotal === null ? (
-                <span className="text-muted-foreground">unavailable — the backend did not price every item</span>
+                <span className="text-muted-foreground">
+                  unavailable — the backend did not price every item
+                </span>
               ) : (
                 <strong>{subtotal.toLocaleString()}</strong>
               )}
@@ -115,7 +130,8 @@ function CartPage() {
               <Link to="/auth" className="underline">
                 Sign in
               </Link>{" "}
-              to create an order — <span className="font-mono">POST /orders</span> requires authentication.
+              to create an order — <span className="font-mono">POST /orders</span> requires
+              authentication.
             </p>
           ) : null}
           {checkout.isError ? <ErrorBlock error={checkout.error} /> : null}
@@ -124,8 +140,9 @@ function CartPage() {
 
       <GapNotice title="Checkout &amp; payment limits">
         <p>
-          The exact <span className="font-mono">POST /orders</span> body is not documented by the backend; this client
-          sends the cart items and shows the backend's own validation response unchanged.
+          The exact <span className="font-mono">POST /orders</span> body is not documented by the
+          backend; this client sends the cart items and shows the backend's own validation response
+          unchanged.
         </p>
         <p className="mt-2">{PAYMENT_CONTRACT_GAP}</p>
       </GapNotice>

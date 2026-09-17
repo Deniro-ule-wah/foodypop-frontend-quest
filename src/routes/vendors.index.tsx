@@ -7,7 +7,10 @@ export const Route = createFileRoute("/vendors/")({
   head: () => ({
     meta: [
       { title: "Vendors — FoodyPop" },
-      { name: "description", content: "Vendors serving dishes on FoodyPop, listed from the live backend." },
+      {
+        name: "description",
+        content: "Vendors serving dishes on FoodyPop, listed from the live backend.",
+      },
       { property: "og:title", content: "Vendors — FoodyPop" },
       { property: "og:description", content: "Supporting vendor information for FoodyPop dishes." },
     ],
@@ -27,7 +30,8 @@ function VendorsPage() {
       <header className="grid gap-2">
         <h1 className="text-3xl text-foreground">Vendors</h1>
         <p className="text-sm text-muted-foreground">
-          Vendors are supporting context for dishes. <span className="font-mono text-xs">GET /vendors</span>
+          Vendors are supporting context for dishes.{" "}
+          <span className="font-mono text-xs">GET /vendors</span>
         </p>
       </header>
 
@@ -46,7 +50,9 @@ function VendorsPage() {
                 params={{ vendorId: v.id }}
                 className="block rounded-2xl border border-border bg-card p-5 transition-shadow hover:shadow-[var(--shadow-warm)]"
               >
-                <p className="font-display text-lg text-foreground">{v.name ?? v.displayName ?? v.id}</p>
+                <p className="font-display text-lg text-foreground">
+                  {v.name ?? v.displayName ?? v.id}
+                </p>
                 {v.location || v.address ? (
                   <p className="mt-1 text-sm text-muted-foreground">{v.location ?? v.address}</p>
                 ) : null}

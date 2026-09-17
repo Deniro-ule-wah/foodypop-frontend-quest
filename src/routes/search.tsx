@@ -9,9 +9,15 @@ export const Route = createFileRoute("/search")({
   head: () => ({
     meta: [
       { title: "Search dishes — FoodyPop" },
-      { name: "description", content: "Search FoodyPop dishes and drinks through the live backend search endpoint." },
+      {
+        name: "description",
+        content: "Search FoodyPop dishes and drinks through the live backend search endpoint.",
+      },
       { property: "og:title", content: "Search dishes — FoodyPop" },
-      { property: "og:description", content: "Search food and drinks against the FoodyPop V2 backend." },
+      {
+        property: "og:description",
+        content: "Search food and drinks against the FoodyPop V2 backend.",
+      },
     ],
   }),
   component: SearchPage,
@@ -57,17 +63,25 @@ function SearchPage() {
         <button type="submit" className="btn-primary" disabled={input.trim().length === 0}>
           Search
         </button>
-        <span className="self-center font-mono text-xs text-muted-foreground">GET /dishes/search</span>
+        <span className="self-center font-mono text-xs text-muted-foreground">
+          GET /dishes/search
+        </span>
       </form>
 
       {term.length === 0 ? (
-        <EmptyBlock title="Enter a search term" hint="Nothing is requested from the backend until you search." />
+        <EmptyBlock
+          title="Enter a search term"
+          hint="Nothing is requested from the backend until you search."
+        />
       ) : results.isPending ? (
         <LoadingBlock label="Searching" />
       ) : results.isError ? (
         <ErrorBlock error={results.error} onRetry={() => results.refetch()} />
       ) : results.data.items.length === 0 ? (
-        <EmptyBlock title={`No dishes matched “${term}”`} hint="The backend returned an empty result set." />
+        <EmptyBlock
+          title={`No dishes matched “${term}”`}
+          hint="The backend returned an empty result set."
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {results.data.items.map((dish) => (

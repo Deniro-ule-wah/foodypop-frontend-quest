@@ -2,7 +2,10 @@ import { apiRequest, type Paginated } from "./client";
 import type { Taxonomy, Vendor } from "./types";
 
 /** VERIFIED: GET /vendors */
-export function listVendors(params: { cursor?: string; limit?: number } = {}, signal?: AbortSignal) {
+export function listVendors(
+  params: { cursor?: string; limit?: number } = {},
+  signal?: AbortSignal,
+) {
   return apiRequest<Paginated<Vendor>>("/vendors", {
     query: { cursor: params.cursor, limit: params.limit },
     auth: true,

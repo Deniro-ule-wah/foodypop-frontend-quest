@@ -15,23 +15,107 @@ export interface ContractEntry {
 }
 
 export const CONTRACT: ContractEntry[] = [
-  { method: "GET", path: "/health", auth: false, status: "VERIFIED", evidence: "200 {ok:true,service:foodypop-api}" },
-  { method: "POST", path: "/auth/register", auth: false, status: "VERIFIED", evidence: "400 field errors: email, password, displayName" },
-  { method: "POST", path: "/auth/login", auth: false, status: "VERIFIED", evidence: "400 field errors: email, password" },
-  { method: "POST", path: "/auth/refresh", auth: false, status: "VERIFIED", evidence: "429 rate-limited (route exists, contract unconfirmed)" },
-  { method: "GET", path: "/dishes/feed", auth: true, status: "VERIFIED", evidence: "200 {items,nextCursor,hasMore}" },
-  { method: "GET", path: "/dishes/search", auth: true, status: "VERIFIED", evidence: "200 {items,nextCursor,hasMore}" },
-  { method: "GET", path: "/dishes/:id", auth: true, status: "VERIFIED", evidence: "404 'Dish not found' (route exists)" },
-  { method: "GET", path: "/vendors", auth: true, status: "VERIFIED", evidence: "200 {items,nextCursor,hasMore}" },
-  { method: "GET", path: "/vendors/:id", auth: true, status: "VERIFIED", evidence: "404 'Vendor not found' (route exists)" },
+  {
+    method: "GET",
+    path: "/health",
+    auth: false,
+    status: "VERIFIED",
+    evidence: "200 {ok:true,service:foodypop-api}",
+  },
+  {
+    method: "POST",
+    path: "/auth/register",
+    auth: false,
+    status: "VERIFIED",
+    evidence: "400 field errors: email, password, displayName",
+  },
+  {
+    method: "POST",
+    path: "/auth/login",
+    auth: false,
+    status: "VERIFIED",
+    evidence: "400 field errors: email, password",
+  },
+  {
+    method: "POST",
+    path: "/auth/refresh",
+    auth: false,
+    status: "VERIFIED",
+    evidence: "429 rate-limited (route exists, contract unconfirmed)",
+  },
+  {
+    method: "GET",
+    path: "/dishes/feed",
+    auth: true,
+    status: "VERIFIED",
+    evidence: "200 {items,nextCursor,hasMore}",
+  },
+  {
+    method: "GET",
+    path: "/dishes/search",
+    auth: true,
+    status: "VERIFIED",
+    evidence: "200 {items,nextCursor,hasMore}",
+  },
+  {
+    method: "GET",
+    path: "/dishes/:id",
+    auth: true,
+    status: "VERIFIED",
+    evidence: "404 'Dish not found' (route exists)",
+  },
+  {
+    method: "GET",
+    path: "/vendors",
+    auth: true,
+    status: "VERIFIED",
+    evidence: "200 {items,nextCursor,hasMore}",
+  },
+  {
+    method: "GET",
+    path: "/vendors/:id",
+    auth: true,
+    status: "VERIFIED",
+    evidence: "404 'Vendor not found' (route exists)",
+  },
   { method: "GET", path: "/cuisines", auth: true, status: "VERIFIED", evidence: "200 []" },
   { method: "GET", path: "/categories", auth: true, status: "VERIFIED", evidence: "200 []" },
-  { method: "GET", path: "/orders", auth: true, status: "VERIFIED", evidence: "401 UNAUTHORIZED (route exists, auth required)" },
-  { method: "POST", path: "/orders", auth: true, status: "VERIFIED", evidence: "401 UNAUTHORIZED (body contract undocumented)" },
-  { method: "GET", path: "/orders/:id", auth: true, status: "VERIFIED", evidence: "401 UNAUTHORIZED" },
-  { method: "POST", path: "/orders/:id/cancel", auth: true, status: "VERIFIED", evidence: "401 UNAUTHORIZED" },
+  {
+    method: "GET",
+    path: "/orders",
+    auth: true,
+    status: "VERIFIED",
+    evidence: "401 UNAUTHORIZED (route exists, auth required)",
+  },
+  {
+    method: "POST",
+    path: "/orders",
+    auth: true,
+    status: "VERIFIED",
+    evidence: "401 UNAUTHORIZED (body contract undocumented)",
+  },
+  {
+    method: "GET",
+    path: "/orders/:id",
+    auth: true,
+    status: "VERIFIED",
+    evidence: "401 UNAUTHORIZED",
+  },
+  {
+    method: "POST",
+    path: "/orders/:id/cancel",
+    auth: true,
+    status: "VERIFIED",
+    evidence: "401 UNAUTHORIZED",
+  },
   { method: "GET", path: "/follows", auth: true, status: "VERIFIED", evidence: "401 UNAUTHORIZED" },
-  { method: "POST", path: "/follows", auth: true, status: "VERIFIED", evidence: "401 UNAUTHORIZED (body contract undocumented)" },
+  {
+    method: "POST",
+    path: "/follows",
+    auth: true,
+    status: "VERIFIED",
+    evidence: "401 UNAUTHORIZED (body contract undocumented)",
+  },
 ];
 
 export interface ContractGap {
@@ -51,7 +135,8 @@ export const CONTRACT_GAPS: ContractGap[] = [
       "POST /orders/:id/pay",
       "POST /orders/:id/payments",
     ],
-    result: "404 NOT_FOUND on all — no endpoint. Client performs no payment call and fabricates no state.",
+    result:
+      "404 NOT_FOUND on all — no endpoint. Client performs no payment call and fabricates no state.",
   },
   {
     capability: "Payment attempt status / reconciliation read",
@@ -61,7 +146,8 @@ export const CONTRACT_GAPS: ContractGap[] = [
   {
     capability: "Taste interactions (Delicious, Sweet, Spicy, …)",
     probed: ["GET/POST /dishes/:id/tastes", "POST /dishes/:id/taste", "GET /tastes"],
-    result: "404 NOT_FOUND — taste actions are shown as unavailable, never persisted locally as success.",
+    result:
+      "404 NOT_FOUND — taste actions are shown as unavailable, never persisted locally as success.",
   },
   {
     capability: "Unfollow",
@@ -81,7 +167,8 @@ export const CONTRACT_GAPS: ContractGap[] = [
   {
     capability: "Order idempotency key",
     probed: ["No documented header or field on POST /orders"],
-    result: "UNKNOWN — client prevents duplicates via single-flight submission; no idempotency model invented.",
+    result:
+      "UNKNOWN — client prevents duplicates via single-flight submission; no idempotency model invented.",
   },
   {
     capability: "Dish reviews / comments",
