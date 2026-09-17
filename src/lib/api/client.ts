@@ -86,7 +86,7 @@ export interface RequestOptions {
   body?: unknown;
   query?: Record<string, string | number | undefined | null>;
   auth?: boolean;
-  signal?: AbortSignal;
+  signal?: AbortSignal | undefined;
 }
 
 function buildUrl(path: string, query?: RequestOptions["query"]): string {
