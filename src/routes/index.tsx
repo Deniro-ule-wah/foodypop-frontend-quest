@@ -57,8 +57,8 @@ function DiscoveryPage() {
           Find the food, not the feed.
         </h1>
         <p className="mt-4 max-w-xl text-muted-foreground">
-          Every dish, drink and cuisine below comes straight from the live FoodyPop backend. Nothing is
-          simulated here.
+          Every dish, drink and cuisine below comes straight from the live FoodyPop backend. Nothing
+          is simulated here.
         </p>
         <div className="mt-6 flex flex-wrap gap-2">
           <Link to="/search" className="btn-primary">
@@ -94,11 +94,7 @@ function DiscoveryPage() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <TaxonomyPanel
-          title="Cuisines"
-          endpoint="GET /cuisines"
-          query={cuisines}
-        />
+        <TaxonomyPanel title="Cuisines" endpoint="GET /cuisines" query={cuisines} />
         <TaxonomyPanel title="Categories" endpoint="GET /categories" query={categories} />
       </section>
     </div>

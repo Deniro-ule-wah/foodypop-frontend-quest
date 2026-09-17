@@ -39,12 +39,15 @@ function VendorDetail() {
       {v.description ? <p className="max-w-2xl text-foreground">{v.description}</p> : null}
 
       <GapNotice title="Vendor dish listing unavailable">
-        The backend exposes no per-vendor dish endpoint (<span className="font-mono">GET /vendors/:id/dishes</span>{" "}
-        returns 404). Use search or the dish feed instead.
+        The backend exposes no per-vendor dish endpoint (
+        <span className="font-mono">GET /vendors/:id/dishes</span> returns 404). Use search or the
+        dish feed instead.
       </GapNotice>
 
       <details className="rounded-2xl border border-border bg-card p-4">
-        <summary className="cursor-pointer text-sm font-medium text-foreground">Raw backend payload</summary>
+        <summary className="cursor-pointer text-sm font-medium text-foreground">
+          Raw backend payload
+        </summary>
         <pre className="mt-3 overflow-x-auto font-mono text-xs text-muted-foreground">
           {JSON.stringify(v, null, 2)}
         </pre>

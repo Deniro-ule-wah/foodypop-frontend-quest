@@ -30,7 +30,9 @@ export function SiteHeader() {
               key={item.to}
               to={item.to}
               className="rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              activeProps={{ className: "rounded-full px-3 py-1.5 text-sm bg-muted text-foreground font-medium" }}
+              activeProps={{
+                className: "rounded-full px-3 py-1.5 text-sm bg-muted text-foreground font-medium",
+              }}
               activeOptions={{ exact: item.to === "/" }}
             >
               {item.label}

@@ -45,7 +45,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">This page didn't load</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          This page didn't load
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -122,8 +124,7 @@ function RootComponent() {
             </main>
             <footer className="border-t border-border px-4 py-6">
               <div className="mx-auto max-w-6xl text-xs text-muted-foreground">
-                FoodyPop web client · backend:{" "}
-                <span className="font-mono">{API_BASE_URL}</span> ·{" "}
+                FoodyPop web client · backend: <span className="font-mono">{API_BASE_URL}</span> ·{" "}
                 <Link to="/diagnostics" className="underline">
                   API diagnostics
                 </Link>

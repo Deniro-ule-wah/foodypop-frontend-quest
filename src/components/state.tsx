@@ -32,7 +32,12 @@ export function GapNotice({ title, children }: { title: string; children?: React
   );
 }
 
-function describe(error: unknown): { heading: string; body: string; meta: string | null; details: string | null } {
+function describe(error: unknown): {
+  heading: string;
+  body: string;
+  meta: string | null;
+  details: string | null;
+} {
   if (error instanceof ApiError) {
     const headings: Record<string, string> = {
       network: "Network unavailable",

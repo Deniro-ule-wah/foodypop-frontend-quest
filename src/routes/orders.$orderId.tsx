@@ -11,9 +11,15 @@ export const Route = createFileRoute("/orders/$orderId")({
   head: () => ({
     meta: [
       { title: "Order detail — FoodyPop" },
-      { name: "description", content: "Backend-authoritative FoodyPop order status and payment state." },
+      {
+        name: "description",
+        content: "Backend-authoritative FoodyPop order status and payment state.",
+      },
       { property: "og:title", content: "Order detail — FoodyPop" },
-      { property: "og:description", content: "Follow a FoodyPop order through the backend's own lifecycle states." },
+      {
+        property: "og:description",
+        content: "Follow a FoodyPop order through the backend's own lifecycle states.",
+      },
     ],
   }),
   component: OrderDetailPage,
@@ -50,7 +56,9 @@ function OrderDetailPage() {
 
   const order = query.data;
   const currentStatus = order?.status ?? order?.state ?? null;
-  const currentIndex = currentStatus ? ORDER_STATES.indexOf(currentStatus as (typeof ORDER_STATES)[number]) : -1;
+  const currentIndex = currentStatus
+    ? ORDER_STATES.indexOf(currentStatus as (typeof ORDER_STATES)[number])
+    : -1;
   const payments = order ? paymentStatesOf(order) : [];
 
   return (
@@ -68,7 +76,10 @@ function OrderDetailPage() {
       {!ready ? (
         <LoadingBlock label="Restoring session" />
       ) : !token ? (
-        <EmptyBlock title="Sign in to view this order" hint="This endpoint requires authentication." />
+        <EmptyBlock
+          title="Sign in to view this order"
+          hint="This endpoint requires authentication."
+        />
       ) : query.isPending ? (
         <LoadingBlock label="Loading order" />
       ) : query.isError ? (
@@ -79,7 +90,9 @@ function OrderDetailPage() {
         <>
           <section className="rounded-2xl border border-border bg-card p-5">
             <p className="text-sm text-muted-foreground">Backend status</p>
-            <p className="mt-1 text-xl font-semibold text-foreground">{currentStatus ?? "Not provided"}</p>
+            <p className="mt-1 text-xl font-semibold text-foreground">
+              {currentStatus ?? "Not provided"}
+            </p>
             <ol className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {ORDER_STATES.map((state, i) => {
                 const reached = currentIndex >= 0 && i <= currentIndex;
@@ -99,7 +112,8 @@ function OrderDetailPage() {
             </ol>
             {currentIndex < 0 ? (
               <p className="mt-3 text-xs text-muted-foreground">
-                The backend reported a status outside the documented lifecycle — shown verbatim above.
+                The backend reported a status outside the documented lifecycle — shown verbatim
+                above.
               </p>
             ) : null}
           </section>
@@ -148,12 +162,16 @@ function OrderDetailPage() {
             >
               {cancel.isPending ? "Cancelling…" : "Cancel order"}
             </button>
-            <p className="font-mono text-xs text-muted-foreground">POST /orders/{"{"}id{"}"}/cancel</p>
+            <p className="font-mono text-xs text-muted-foreground">
+              POST /orders/{"{"}id{"}"}/cancel
+            </p>
             {cancel.isError ? <ErrorBlock error={cancel.error} /> : null}
           </section>
 
           <details className="rounded-2xl border border-border bg-card p-5">
-            <summary className="cursor-pointer text-sm text-muted-foreground">Raw backend payload</summary>
+            <summary className="cursor-pointer text-sm text-muted-foreground">
+              Raw backend payload
+            </summary>
             <pre className="mt-3 overflow-x-auto rounded-xl bg-muted p-3 font-mono text-xs text-muted-foreground">
               {JSON.stringify(order, null, 2)}
             </pre>

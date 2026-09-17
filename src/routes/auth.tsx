@@ -9,7 +9,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — FoodyPop" },
-      { name: "description", content: "Sign in or create a FoodyPop account against the live V2 backend." },
+      {
+        name: "description",
+        content: "Sign in or create a FoodyPop account against the live V2 backend.",
+      },
       { property: "og:title", content: "Sign in — FoodyPop" },
       { property: "og:description", content: "Authenticate against the FoodyPop V2 backend." },
     ],
@@ -27,9 +30,7 @@ function AuthPage() {
 
   const submit = useMutation({
     mutationFn: async () =>
-      mode === "login"
-        ? login({ email, password })
-        : register({ email, password, displayName }),
+      mode === "login" ? login({ email, password }) : register({ email, password, displayName }),
     onSuccess: (result) => {
       signIn(result.token, result.user);
       if (result.token) navigate({ to: "/" });
@@ -39,7 +40,9 @@ function AuthPage() {
   return (
     <div className="mx-auto grid max-w-md gap-6">
       <header className="grid gap-2">
-        <h1 className="text-3xl text-foreground">{mode === "login" ? "Sign in" : "Create account"}</h1>
+        <h1 className="text-3xl text-foreground">
+          {mode === "login" ? "Sign in" : "Create account"}
+        </h1>
         <p className="font-mono text-xs text-muted-foreground">
           POST {mode === "login" ? "/auth/login" : "/auth/register"}
         </p>
@@ -48,7 +51,8 @@ function AuthPage() {
       {token ? (
         <div className="rounded-2xl border border-border bg-card p-5">
           <p className="text-sm text-foreground">
-            Signed in{user?.displayName ? ` as ${user.displayName}` : ""}. A bearer token is stored in this browser.
+            Signed in{user?.displayName ? ` as ${user.displayName}` : ""}. A bearer token is stored
+            in this browser.
           </p>
           <button type="button" className="btn-secondary mt-3" onClick={signOut}>
             Sign out
@@ -98,7 +102,11 @@ function AuthPage() {
           />
         </label>
         <button type="submit" className="btn-primary" disabled={submit.isPending}>
-          {submit.isPending ? "Contacting backend…" : mode === "login" ? "Sign in" : "Create account"}
+          {submit.isPending
+            ? "Contacting backend…"
+            : mode === "login"
+              ? "Sign in"
+              : "Create account"}
         </button>
         <button
           type="button"
@@ -115,15 +123,16 @@ function AuthPage() {
       {submit.isError ? <ErrorBlock error={submit.error} /> : null}
       {submit.isSuccess && !submit.data.token ? (
         <GapNotice title="No bearer token in the response">
-          The backend accepted the request but returned no recognisable token field, so authenticated calls will
-          still return 401. Backend dependency: a documented auth token response.
+          The backend accepted the request but returned no recognisable token field, so
+          authenticated calls will still return 401. Backend dependency: a documented auth token
+          response.
         </GapNotice>
       ) : null}
 
       <GapNotice title="Session behaviour">
         The backend exposes no <span className="font-mono">/auth/me</span> or{" "}
-        <span className="font-mono">/auth/logout</span>. Identity comes from the sign-in response only, and signing
-        out clears this browser's session without a server call.
+        <span className="font-mono">/auth/logout</span>. Identity comes from the sign-in response
+        only, and signing out clears this browser's session without a server call.
       </GapNotice>
     </div>
   );

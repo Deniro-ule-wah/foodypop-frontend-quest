@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import type { Dish } from "./api/types";
 
 /**
@@ -80,7 +88,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           name: dishDisplayName(dish),
           unitPrice: dishEffectivePrice(dish),
           currency: (dish.currency as string) ?? null,
-          vendorId: (dish.vendorId as string) ?? (dish.vendor?.id ?? null),
+          vendorId: (dish.vendorId as string) ?? dish.vendor?.id ?? null,
           quantity: 1,
         },
       ];

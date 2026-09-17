@@ -10,10 +10,14 @@ export const Route = createFileRoute("/diagnostics")({
       { title: "API diagnostics — FoodyPop" },
       {
         name: "description",
-        content: "Backend target, live health check, verified endpoint contract and documented gaps.",
+        content:
+          "Backend target, live health check, verified endpoint contract and documented gaps.",
       },
       { property: "og:title", content: "API diagnostics — FoodyPop" },
-      { property: "og:description", content: "What this FoodyPop client is allowed to call, with evidence." },
+      {
+        property: "og:description",
+        content: "What this FoodyPop client is allowed to call, with evidence.",
+      },
     ],
   }),
   component: DiagnosticsPage,
@@ -31,7 +35,8 @@ function DiagnosticsPage() {
       <header className="grid gap-2">
         <h1 className="text-3xl text-foreground">API diagnostics</h1>
         <p className="text-sm text-muted-foreground">
-          Every backend route this client is permitted to call, with the evidence it was verified against.
+          Every backend route this client is permitted to call, with the evidence it was verified
+          against.
         </p>
       </header>
 
@@ -40,7 +45,8 @@ function DiagnosticsPage() {
           Active backend: <span className="font-mono">{API_BASE_URL}</span>
         </p>
         <p className="text-sm text-muted-foreground">
-          Legacy host <span className="font-mono">{LEGACY_BACKEND}</span> is not used by this client.
+          Legacy host <span className="font-mono">{LEGACY_BACKEND}</span> is not used by this
+          client.
         </p>
         <div className="mt-2">
           {health.isPending ? (
@@ -73,7 +79,9 @@ function DiagnosticsPage() {
                 <tr key={`${entry.method} ${entry.path}`} className="border-t border-border">
                   <td className="px-4 py-2 font-mono text-xs">{entry.method}</td>
                   <td className="px-4 py-2 font-mono text-xs">{entry.path}</td>
-                  <td className="px-4 py-2 text-xs text-muted-foreground">{entry.auth ? "required" : "public"}</td>
+                  <td className="px-4 py-2 text-xs text-muted-foreground">
+                    {entry.auth ? "required" : "public"}
+                  </td>
                   <td className="px-4 py-2 text-xs font-semibold">{entry.status}</td>
                   <td className="px-4 py-2 text-xs text-muted-foreground">{entry.evidence}</td>
                 </tr>
@@ -89,7 +97,9 @@ function DiagnosticsPage() {
           {CONTRACT_GAPS.map((gap) => (
             <li key={gap.capability} className="rounded-2xl border border-border bg-card p-4">
               <p className="font-medium text-foreground">{gap.capability}</p>
-              <p className="mt-1 font-mono text-xs text-muted-foreground">{gap.probed.join(" · ")}</p>
+              <p className="mt-1 font-mono text-xs text-muted-foreground">
+                {gap.probed.join(" · ")}
+              </p>
               <p className="mt-2 text-sm text-muted-foreground">{gap.result}</p>
             </li>
           ))}

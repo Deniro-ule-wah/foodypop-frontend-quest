@@ -35,7 +35,11 @@ export const Route = createFileRoute("/dishes/$dishId")({
 
 function Field({ label, value }: { label: string; value: unknown }) {
   if (value === null || value === undefined || value === "") return null;
-  const text = Array.isArray(value) ? value.join(", ") : typeof value === "object" ? JSON.stringify(value) : String(value);
+  const text = Array.isArray(value)
+    ? value.join(", ")
+    : typeof value === "object"
+      ? JSON.stringify(value)
+      : String(value);
   return (
     <div className="border-b border-border py-2 last:border-0">
       <dt className="text-xs uppercase tracking-wide text-muted-foreground">{label}</dt>
@@ -117,20 +121,40 @@ function DishDetail() {
           ) : null}
           {follow.isError ? <ErrorBlock error={follow.error} /> : null}
           {follow.isSuccess ? (
-            <p className="text-sm text-[color:var(--color-success)]">Backend accepted the follow request.</p>
+            <p className="text-sm text-[color:var(--color-success)]">
+              Backend accepted the follow request.
+            </p>
           ) : null}
           {UNFOLLOW_SUPPORTED ? null : (
             <p className="text-xs text-muted-foreground">Unfollow is not exposed by the backend.</p>
           )}
 
           <dl className="rounded-2xl border border-border bg-card p-4">
-            <Field label="Classification" value={d.kind ?? d.type ?? (d.isDrink ? "Drink" : null)} />
-            <Field label="Cooked / raw" value={d.isCooked === null || d.isCooked === undefined ? d.preparation : d.isCooked ? "Cooked" : "Raw"} />
+            <Field
+              label="Classification"
+              value={d.kind ?? d.type ?? (d.isDrink ? "Drink" : null)}
+            />
+            <Field
+              label="Cooked / raw"
+              value={
+                d.isCooked === null || d.isCooked === undefined
+                  ? d.preparation
+                  : d.isCooked
+                    ? "Cooked"
+                    : "Raw"
+              }
+            />
             <Field label="Ingredients" value={d.ingredients} />
             <Field label="Recipe" value={d.recipe} />
             <Field label="Cuisine" value={cuisineName} />
             <Field label="Category" value={categoryName} />
-            <Field label="Availability" value={d.availability ?? (d.isAvailable === undefined ? null : d.isAvailable ? "Available" : "Unavailable")} />
+            <Field
+              label="Availability"
+              value={
+                d.availability ??
+                (d.isAvailable === undefined ? null : d.isAvailable ? "Available" : "Unavailable")
+              }
+            />
             <Field label="Location" value={d.location} />
             <Field label="Vendor" value={d.vendor?.name ?? d.vendor?.displayName ?? d.vendorId} />
           </dl>
@@ -140,13 +164,19 @@ function DishDetail() {
       <section className="grid gap-3">
         <h2 className="text-2xl text-foreground">Taste reactions</h2>
         <GapNotice title="Taste interactions are unavailable">
-          The backend exposes no taste mutation (<span className="font-mono">/dishes/:id/tastes</span> returns 404),
-          so these are shown for reference only and nothing is recorded.
+          The backend exposes no taste mutation (
+          <span className="font-mono">/dishes/:id/tastes</span> returns 404), so these are shown for
+          reference only and nothing is recorded.
         </GapNotice>
         <ul className="flex flex-wrap gap-2">
           {TASTES.map((t) => (
             <li key={t}>
-              <button type="button" className="btn-secondary text-xs" disabled title="Backend capability unavailable">
+              <button
+                type="button"
+                className="btn-secondary text-xs"
+                disabled
+                title="Backend capability unavailable"
+              >
                 {t}
               </button>
             </li>
@@ -155,7 +185,9 @@ function DishDetail() {
       </section>
 
       <details className="rounded-2xl border border-border bg-card p-4">
-        <summary className="cursor-pointer text-sm font-medium text-foreground">Raw backend payload</summary>
+        <summary className="cursor-pointer text-sm font-medium text-foreground">
+          Raw backend payload
+        </summary>
         <pre className="mt-3 overflow-x-auto font-mono text-xs text-muted-foreground">
           {JSON.stringify(d, null, 2)}
         </pre>

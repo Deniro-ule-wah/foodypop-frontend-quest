@@ -36,11 +36,15 @@ export function DishCard({ dish }: { dish: Dish }) {
         )}
       </div>
       <div className="grid gap-1 p-4">
-        <h3 className="font-display text-lg leading-tight text-foreground">{dishDisplayName(dish)}</h3>
+        <h3 className="font-display text-lg leading-tight text-foreground">
+          {dishDisplayName(dish)}
+        </h3>
         {price ? (
           <p className="text-sm font-semibold text-primary">
             {price}
-            {hasDiscount ? <span className="ml-2 text-xs font-normal text-muted-foreground">discounted</span> : null}
+            {hasDiscount ? (
+              <span className="ml-2 text-xs font-normal text-muted-foreground">discounted</span>
+            ) : null}
           </p>
         ) : null}
         {vendorName ? <p className="text-xs text-muted-foreground">{vendorName}</p> : null}
