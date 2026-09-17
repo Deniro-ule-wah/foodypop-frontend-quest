@@ -111,12 +111,10 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   const url = buildUrl(path, query);
   let res: Response;
   try {
-    res = await fetch(url, {
-      method,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-      signal,
-    });
+    const init: RequestInit = { method, headers };
+    if (body !== undefined) init.body = JSON.stringify(body);
+    if (signal) init.signal = signal;
+    res = await fetch(url, init);
   } catch (cause) {
     if ((cause as Error)?.name === "AbortError") throw cause;
     throw new ApiError({
