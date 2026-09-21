@@ -16,6 +16,7 @@ import { Route as DiagnosticsRouteImport } from './routes/diagnostics'
 import { Route as DrinksRouteImport } from './routes/drinks'
 import { Route as FoodRouteImport } from './routes/food'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as DishesIndexRouteImport } from './routes/dishes.index'
 import { Route as DishesDishIdRouteImport } from './routes/dishes.$dishId'
 import { Route as OrdersIndexRouteImport } from './routes/orders.index'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
@@ -57,6 +58,11 @@ const SearchRoute = SearchRouteImport.update({
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DishesIndexRoute = DishesIndexRouteImport.update({
+  id: '/dishes/',
+  path: '/dishes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DishesDishIdRoute = DishesDishIdRouteImport.update({
   id: '/dishes/$dishId',
   path: '/dishes/$dishId',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/dishes/$dishId': typeof DishesDishIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/vendors/$vendorId': typeof VendorsVendorIdRoute
+  '/dishes/': typeof DishesIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/vendors/': typeof VendorsIndexRoute
 }
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/dishes/$dishId': typeof DishesDishIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/vendors/$vendorId': typeof VendorsVendorIdRoute
+  '/dishes': typeof DishesIndexRoute
   '/orders': typeof OrdersIndexRoute
   '/vendors': typeof VendorsIndexRoute
 }
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/dishes/$dishId': typeof DishesDishIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/vendors/$vendorId': typeof VendorsVendorIdRoute
+  '/dishes/': typeof DishesIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/vendors/': typeof VendorsIndexRoute
 }
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/dishes/$dishId'
     | '/orders/$orderId'
     | '/vendors/$vendorId'
+    | '/dishes/'
     | '/orders/'
     | '/vendors/'
   fileRoutesByTo: FileRoutesByTo
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/dishes/$dishId'
     | '/orders/$orderId'
     | '/vendors/$vendorId'
+    | '/dishes'
     | '/orders'
     | '/vendors'
   id:
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/dishes/$dishId'
     | '/orders/$orderId'
     | '/vendors/$vendorId'
+    | '/dishes/'
     | '/orders/'
     | '/vendors/'
   fileRoutesById: FileRoutesById
@@ -182,6 +194,7 @@ export interface RootRouteChildren {
   DishesDishIdRoute: typeof DishesDishIdRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   VendorsVendorIdRoute: typeof VendorsVendorIdRoute
+  DishesIndexRoute: typeof DishesIndexRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
   VendorsIndexRoute: typeof VendorsIndexRoute
 }
@@ -237,6 +250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dishes/': {
+      id: '/dishes/'
+      path: '/dishes'
+      fullPath: '/dishes/'
+      preLoaderRoute: typeof DishesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dishes/$dishId': {
       id: '/dishes/$dishId'
       path: '/dishes/$dishId'
@@ -286,6 +306,7 @@ const rootRouteChildren: RootRouteChildren = {
   DishesDishIdRoute: DishesDishIdRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   VendorsVendorIdRoute: VendorsVendorIdRoute,
+  DishesIndexRoute: DishesIndexRoute,
   OrdersIndexRoute: OrdersIndexRoute,
   VendorsIndexRoute: VendorsIndexRoute,
 }
