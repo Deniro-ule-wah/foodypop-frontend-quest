@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as CuisinesRouteImport } from './routes/cuisines'
 import { Route as DiagnosticsRouteImport } from './routes/diagnostics'
 import { Route as DrinksRouteImport } from './routes/drinks'
 import { Route as FoodRouteImport } from './routes/food'
@@ -36,6 +37,11 @@ const AuthRoute = AuthRouteImport.update({
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CuisinesRoute = CuisinesRouteImport.update({
+  id: '/cuisines',
+  path: '/cuisines',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiagnosticsRoute = DiagnosticsRouteImport.update({
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/cuisines': typeof CuisinesRoute
   '/diagnostics': typeof DiagnosticsRoute
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/cuisines': typeof CuisinesRoute
   '/diagnostics': typeof DiagnosticsRoute
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/cuisines': typeof CuisinesRoute
   '/diagnostics': typeof DiagnosticsRoute
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/cart'
+    | '/cuisines'
     | '/diagnostics'
     | '/drinks'
     | '/food'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/cart'
+    | '/cuisines'
     | '/diagnostics'
     | '/drinks'
     | '/food'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/cart'
+    | '/cuisines'
     | '/diagnostics'
     | '/drinks'
     | '/food'
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
+  CuisinesRoute: typeof CuisinesRoute
   DiagnosticsRoute: typeof DiagnosticsRoute
   DrinksRoute: typeof DrinksRoute
   FoodRoute: typeof FoodRoute
@@ -220,6 +233,13 @@ declare module '@tanstack/react-router' {
       path: '/cart'
       fullPath: '/cart'
       preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cuisines': {
+      id: '/cuisines'
+      path: '/cuisines'
+      fullPath: '/cuisines'
+      preLoaderRoute: typeof CuisinesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/diagnostics': {
@@ -299,6 +319,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,
+  CuisinesRoute: CuisinesRoute,
   DiagnosticsRoute: DiagnosticsRoute,
   DrinksRoute: DrinksRoute,
   FoodRoute: FoodRoute,
