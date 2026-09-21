@@ -18,6 +18,7 @@ import { Route as DiagnosticsRouteImport } from './routes/diagnostics'
 import { Route as DrinksRouteImport } from './routes/drinks'
 import { Route as FoodRouteImport } from './routes/food'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as CuisineSlugRouteImport } from './routes/cuisine.$slug'
 import { Route as DishesIndexRouteImport } from './routes/dishes.index'
 import { Route as DishesDishIdRouteImport } from './routes/dishes.$dishId'
@@ -71,6 +72,11 @@ const SearchRoute = SearchRouteImport.update({
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CategorySlugRoute = CategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CuisineSlugRoute = CuisineSlugRouteImport.update({
   id: '/cuisine/$slug',
   path: '/cuisine/$slug',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
   '/search': typeof SearchRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/cuisine/$slug': typeof CuisineSlugRoute
   '/dishes/$dishId': typeof DishesDishIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
   '/search': typeof SearchRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/cuisine/$slug': typeof CuisineSlugRoute
   '/dishes/$dishId': typeof DishesDishIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
   '/search': typeof SearchRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/cuisine/$slug': typeof CuisineSlugRoute
   '/dishes/$dishId': typeof DishesDishIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
@@ -174,6 +183,7 @@ export interface FileRouteTypes {
     | '/drinks'
     | '/food'
     | '/search'
+    | '/category/$slug'
     | '/cuisine/$slug'
     | '/dishes/$dishId'
     | '/orders/$orderId'
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/drinks'
     | '/food'
     | '/search'
+    | '/category/$slug'
     | '/cuisine/$slug'
     | '/dishes/$dishId'
     | '/orders/$orderId'
@@ -210,6 +221,7 @@ export interface FileRouteTypes {
     | '/drinks'
     | '/food'
     | '/search'
+    | '/category/$slug'
     | '/cuisine/$slug'
     | '/dishes/$dishId'
     | '/orders/$orderId'
@@ -229,6 +241,7 @@ export interface RootRouteChildren {
   DrinksRoute: typeof DrinksRoute
   FoodRoute: typeof FoodRoute
   SearchRoute: typeof SearchRoute
+  CategorySlugRoute: typeof CategorySlugRoute
   CuisineSlugRoute: typeof CuisineSlugRoute
   DishesDishIdRoute: typeof DishesDishIdRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
@@ -303,6 +316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/category/$slug': {
+      id: '/category/$slug'
+      path: '/category/$slug'
+      fullPath: '/category/$slug'
+      preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cuisine/$slug': {
       id: '/cuisine/$slug'
       path: '/cuisine/$slug'
@@ -365,6 +385,7 @@ const rootRouteChildren: RootRouteChildren = {
   DrinksRoute: DrinksRoute,
   FoodRoute: FoodRoute,
   SearchRoute: SearchRoute,
+  CategorySlugRoute: CategorySlugRoute,
   CuisineSlugRoute: CuisineSlugRoute,
   DishesDishIdRoute: DishesDishIdRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
