@@ -10,10 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as CuisinesRouteImport } from './routes/cuisines'
 import { Route as DiagnosticsRouteImport } from './routes/diagnostics'
+import { Route as DrinksRouteImport } from './routes/drinks'
+import { Route as FoodRouteImport } from './routes/food'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as CuisineSlugRouteImport } from './routes/cuisine.$slug'
+import { Route as DishSlugRouteImport } from './routes/dish.$slug'
+import { Route as DishesIndexRouteImport } from './routes/dishes.index'
 import { Route as DishesDishIdRouteImport } from './routes/dishes.$dishId'
 import { Route as OrdersIndexRouteImport } from './routes/orders.index'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
@@ -23,6 +32,11 @@ import { Route as VendorsVendorIdRouteImport } from './routes/vendors.$vendorId'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -35,14 +49,54 @@ const CartRoute = CartRouteImport.update({
   path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CategoriesRoute = CategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CuisinesRoute = CuisinesRouteImport.update({
+  id: '/cuisines',
+  path: '/cuisines',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DiagnosticsRoute = DiagnosticsRouteImport.update({
   id: '/diagnostics',
   path: '/diagnostics',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DrinksRoute = DrinksRouteImport.update({
+  id: '/drinks',
+  path: '/drinks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FoodRoute = FoodRouteImport.update({
+  id: '/food',
+  path: '/food',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategorySlugRoute = CategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CuisineSlugRoute = CuisineSlugRouteImport.update({
+  id: '/cuisine/$slug',
+  path: '/cuisine/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DishSlugRoute = DishSlugRouteImport.update({
+  id: '/dish/$slug',
+  path: '/dish/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DishesIndexRoute = DishesIndexRouteImport.update({
+  id: '/dishes/',
+  path: '/dishes/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DishesDishIdRoute = DishesDishIdRouteImport.update({
@@ -73,38 +127,65 @@ const VendorsVendorIdRoute = VendorsVendorIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/categories': typeof CategoriesRoute
+  '/cuisines': typeof CuisinesRoute
   '/diagnostics': typeof DiagnosticsRoute
+  '/drinks': typeof DrinksRoute
+  '/food': typeof FoodRoute
   '/search': typeof SearchRoute
+  '/category/$slug': typeof CategorySlugRoute
+  '/cuisine/$slug': typeof CuisineSlugRoute
+  '/dish/$slug': typeof DishSlugRoute
   '/dishes/$dishId': typeof DishesDishIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/vendors/$vendorId': typeof VendorsVendorIdRoute
+  '/dishes/': typeof DishesIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/vendors/': typeof VendorsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/categories': typeof CategoriesRoute
+  '/cuisines': typeof CuisinesRoute
   '/diagnostics': typeof DiagnosticsRoute
+  '/drinks': typeof DrinksRoute
+  '/food': typeof FoodRoute
   '/search': typeof SearchRoute
+  '/category/$slug': typeof CategorySlugRoute
+  '/cuisine/$slug': typeof CuisineSlugRoute
+  '/dish/$slug': typeof DishSlugRoute
   '/dishes/$dishId': typeof DishesDishIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/vendors/$vendorId': typeof VendorsVendorIdRoute
+  '/dishes': typeof DishesIndexRoute
   '/orders': typeof OrdersIndexRoute
   '/vendors': typeof VendorsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
+  '/categories': typeof CategoriesRoute
+  '/cuisines': typeof CuisinesRoute
   '/diagnostics': typeof DiagnosticsRoute
+  '/drinks': typeof DrinksRoute
+  '/food': typeof FoodRoute
   '/search': typeof SearchRoute
+  '/category/$slug': typeof CategorySlugRoute
+  '/cuisine/$slug': typeof CuisineSlugRoute
+  '/dish/$slug': typeof DishSlugRoute
   '/dishes/$dishId': typeof DishesDishIdRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
   '/vendors/$vendorId': typeof VendorsVendorIdRoute
+  '/dishes/': typeof DishesIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/vendors/': typeof VendorsIndexRoute
 }
@@ -112,50 +193,86 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/auth'
     | '/cart'
+    | '/categories'
+    | '/cuisines'
     | '/diagnostics'
+    | '/drinks'
+    | '/food'
     | '/search'
+    | '/category/$slug'
+    | '/cuisine/$slug'
+    | '/dish/$slug'
     | '/dishes/$dishId'
     | '/orders/$orderId'
     | '/vendors/$vendorId'
+    | '/dishes/'
     | '/orders/'
     | '/vendors/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/auth'
     | '/cart'
+    | '/categories'
+    | '/cuisines'
     | '/diagnostics'
+    | '/drinks'
+    | '/food'
     | '/search'
+    | '/category/$slug'
+    | '/cuisine/$slug'
+    | '/dish/$slug'
     | '/dishes/$dishId'
     | '/orders/$orderId'
     | '/vendors/$vendorId'
+    | '/dishes'
     | '/orders'
     | '/vendors'
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/auth'
     | '/cart'
+    | '/categories'
+    | '/cuisines'
     | '/diagnostics'
+    | '/drinks'
+    | '/food'
     | '/search'
+    | '/category/$slug'
+    | '/cuisine/$slug'
+    | '/dish/$slug'
     | '/dishes/$dishId'
     | '/orders/$orderId'
     | '/vendors/$vendorId'
+    | '/dishes/'
     | '/orders/'
     | '/vendors/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
+  CategoriesRoute: typeof CategoriesRoute
+  CuisinesRoute: typeof CuisinesRoute
   DiagnosticsRoute: typeof DiagnosticsRoute
+  DrinksRoute: typeof DrinksRoute
+  FoodRoute: typeof FoodRoute
   SearchRoute: typeof SearchRoute
+  CategorySlugRoute: typeof CategorySlugRoute
+  CuisineSlugRoute: typeof CuisineSlugRoute
+  DishSlugRoute: typeof DishSlugRoute
   DishesDishIdRoute: typeof DishesDishIdRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
   VendorsVendorIdRoute: typeof VendorsVendorIdRoute
+  DishesIndexRoute: typeof DishesIndexRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
   VendorsIndexRoute: typeof VendorsIndexRoute
 }
@@ -167,6 +284,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -183,6 +307,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/categories': {
+      id: '/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cuisines': {
+      id: '/cuisines'
+      path: '/cuisines'
+      fullPath: '/cuisines'
+      preLoaderRoute: typeof CuisinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/diagnostics': {
       id: '/diagnostics'
       path: '/diagnostics'
@@ -190,11 +328,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DiagnosticsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/drinks': {
+      id: '/drinks'
+      path: '/drinks'
+      fullPath: '/drinks'
+      preLoaderRoute: typeof DrinksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/food': {
+      id: '/food'
+      path: '/food'
+      fullPath: '/food'
+      preLoaderRoute: typeof FoodRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/category/$slug': {
+      id: '/category/$slug'
+      path: '/category/$slug'
+      fullPath: '/category/$slug'
+      preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cuisine/$slug': {
+      id: '/cuisine/$slug'
+      path: '/cuisine/$slug'
+      fullPath: '/cuisine/$slug'
+      preLoaderRoute: typeof CuisineSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dish/$slug': {
+      id: '/dish/$slug'
+      path: '/dish/$slug'
+      fullPath: '/dish/$slug'
+      preLoaderRoute: typeof DishSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dishes/': {
+      id: '/dishes/'
+      path: '/dishes'
+      fullPath: '/dishes/'
+      preLoaderRoute: typeof DishesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dishes/$dishId': {
@@ -237,13 +417,22 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,
+  CategoriesRoute: CategoriesRoute,
+  CuisinesRoute: CuisinesRoute,
   DiagnosticsRoute: DiagnosticsRoute,
+  DrinksRoute: DrinksRoute,
+  FoodRoute: FoodRoute,
   SearchRoute: SearchRoute,
+  CategorySlugRoute: CategorySlugRoute,
+  CuisineSlugRoute: CuisineSlugRoute,
+  DishSlugRoute: DishSlugRoute,
   DishesDishIdRoute: DishesDishIdRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
   VendorsVendorIdRoute: VendorsVendorIdRoute,
+  DishesIndexRoute: DishesIndexRoute,
   OrdersIndexRoute: OrdersIndexRoute,
   VendorsIndexRoute: VendorsIndexRoute,
 }
