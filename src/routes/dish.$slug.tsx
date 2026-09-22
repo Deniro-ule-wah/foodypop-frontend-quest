@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getDish, createGesture, TASTES } from "@/lib/api/dishes";
-import { createFollow, deleteFollow } from "@/lib/api/follows";
+import { createFollow, deleteFollow, listFollows } from "@/lib/api/follows";
 import { ApiError } from "@/lib/api/client";
 import { ErrorBlock, GapNotice } from "@/components/state";
 import { Breadcrumbs } from "@/components/breadcrumbs";
@@ -113,30 +113,55 @@ function DishDetail() {
   const { slug } = Route.useParams();
   const { dish: d } = Route.useLoaderData();
   const { add } = useCart();
-  const { token } = useSession();
+  const { token, user } = useSession();
+  const queryClient = useQueryClient();
+
+  // Server-authoritative follow state: GET /follows gives us the current user's
+  // followed target IDs. We derive `isFollowing` from this, not from mutation
+  // success state. This stays correct after refresh, navigation, and logout/login.
+  const followQuery = useQuery({
+    queryKey: ["follows"],
+    queryFn: ({ signal }) => listFollows(signal),
+    enabled: !!token,
+    select: (data: unknown) => {
+      if (!data || typeof data !== "object") return new Set<string>();
+      const body = data as Record<string, unknown>;
+      const items = (body.items as Array<Record<string, unknown>>) ?? [];
+      return new Set(items.filter((f) => f.targetType === "DISH").map((f) => f.targetId as string));
+    },
+  });
+
+  const followedDishIds = followQuery.data ?? new Set<string>();
+  const isFollowing = followedDishIds.has(d.id);
 
   const follow = useMutation({
-    mutationFn: (dish: Dish) => createFollow({ targetType: "DISH", targetId: dish.id }),
+    mutationFn: (body: { targetType: string; targetId: string }) => createFollow(body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["follows"] });
+    },
   });
 
   const unfollow = useMutation({
-    mutationFn: (dish: Dish) =>
-      deleteFollow({ targetType: "DISH", targetId: dish.id }),
+    mutationFn: (body: { targetType: string; targetId: string }) => deleteFollow(body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["follows"] });
+    },
   });
 
   const gesture = useMutation({
     mutationFn: (type: string) => createGesture(d.id, type),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["dish", d.id] }),
   });
 
   // Determine the current user's active gesture from the dish's gestures array.
   const currentGesture: string | undefined = (() => {
-    if (!token || !d.gestures) return undefined;
+    if (!d.gestures) return undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const arr = d.gestures as any[];
     if (!Array.isArray(arr)) return undefined;
     const match = arr.find(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (g: any) => (g.userId as string) === token || (g.user?.id as string) === token,
+      (g: any) => (g.userId as string) === user?.id,
     );
     return match?.type as string | undefined;
   })();
@@ -149,12 +174,12 @@ function DishDetail() {
   const vendorName = d.vendor?.name || d.vendor?.displayName || null;
   const vendorId = (d.vendor?.id as string) || (d.vendorId as string) || null;
 
-  const followBtn = follow.isSuccess ? (
+  const followBtn = isFollowing ? (
     <button
       type="button"
       className="btn-ghost"
       disabled={unfollow.isPending}
-      onClick={() => unfollow.mutate(d)}
+      onClick={() => unfollow.mutate({ targetType: "DISH", targetId: d.id })}
     >
       {unfollow.isPending ? "Unfollowing…" : "Unfollow"}
     </button>
@@ -163,7 +188,7 @@ function DishDetail() {
       type="button"
       className="btn-secondary"
       disabled={!token || follow.isPending}
-      onClick={() => follow.mutate(d)}
+      onClick={() => follow.mutate({ targetType: "DISH", targetId: d.id })}
     >
       {follow.isPending ? "Following…" : "Follow dish"}
     </button>
@@ -235,11 +260,8 @@ function DishDetail() {
               to follow dishes.
             </p>
           ) : null}
-          {follow.isError ? <ErrorBlock error={follow.error} /> : null}
+          {followQuery.isError ? <ErrorBlock error={followQuery.error} /> : null}
           {unfollow.isError ? <ErrorBlock error={unfollow.error} /> : null}
-          {follow.isSuccess ? (
-            <p className="text-sm text-[color:var(--color-success)]">Dish followed.</p>
-          ) : null}
 
           <dl className="rounded-2xl border border-border bg-card p-4">
             <Field

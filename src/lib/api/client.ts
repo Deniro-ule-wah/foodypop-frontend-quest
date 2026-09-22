@@ -106,11 +106,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   const headers: Record<string, string> = { accept: "application/json" };
   if (body !== undefined) headers["content-type"] = "application/json";
   if (idempotencyKey) headers["Idempotency-Key"] = idempotencyKey;
-  if (extraHeaders) {
-    for (const [k, v] of Object.entries(extraHeaders)) {
-      if (v !== undefined && v !== null && v !== "") headers[k] = v;
-    }
-  }
+  if (extraHeaders) Object.assign(headers, extraHeaders);
   if (auth) {
     const token = tokenStore.get();
     if (token) headers["authorization"] = `Bearer ${token}`;

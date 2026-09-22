@@ -38,8 +38,8 @@ function AboutPage() {
       </ul>
       <h2 className="text-2xl text-foreground">What is not here yet</h2>
       <p className="text-muted-foreground">
-        Paying for an order from the web, taste reactions and unfollowing are not available in the
-        web hub yet. Where a feature is missing, the page says so instead of pretending it worked.
+        Vendor creation from the web hub is not yet built. Where a feature is missing, the
+        page says so instead of pretending it worked.
       </p>
       <p className="text-sm text-muted-foreground">
         Start browsing:{" "}

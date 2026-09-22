@@ -114,7 +114,7 @@ function CartPage() {
               Subtotal:{" "}
               {subtotal === null ? (
                 <span className="text-muted-foreground">
-                  unavailable — the backend did not price every item
+                  not available — the backend did not provide prices for every item
                 </span>
               ) : (
                 <strong>{subtotal.toLocaleString()}</strong>
