@@ -71,7 +71,15 @@ function HomePage() {
 
   const feed = useQuery({
     queryKey: ["dishes", "feed", "hub", intent, budget],
-    queryFn: ({ signal }) => getDishFeed({ limit: 48, maxBudget: budget ?? undefined }, signal),
+    queryFn: ({ signal }) =>
+      getDishFeed(
+        {
+          limit: 48,
+          maxBudget: budget ?? undefined,
+          kind: intent === "thirsty" ? "DRINK" : undefined,
+        },
+        signal,
+      ),
     retry: false,
   });
 

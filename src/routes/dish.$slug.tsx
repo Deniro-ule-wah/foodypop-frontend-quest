@@ -246,7 +246,11 @@ function DishDetail() {
                 <span className="text-muted-foreground">/100</span>
               </span>
             </div>
-          ) : null}
+          ) : (
+            <p className="mt-2 text-sm text-muted-foreground">
+              Taste score — not enough data yet
+            </p>
+          )}
 
           <div className="flex flex-wrap gap-2">
             <button type="button" className="btn-primary" onClick={() => add(d)}>
