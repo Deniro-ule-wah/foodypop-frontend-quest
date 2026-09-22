@@ -376,17 +376,18 @@ function IntentSelector({
 }) {
   return (
     <div className="grid gap-6">
-      <header className="text-center">
+      <div className="flex items-center justify-center gap-3 text-center">
+        <BrandLogo size="sm" />
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
           FoodyPop
         </p>
-        <h1 className="mt-2 text-3xl font-display leading-tight text-foreground sm:text-4xl">
-          What are you looking for?
-        </h1>
-        <p className="mt-2 max-w-lg text-muted-foreground">
-          Tell us what you want and we'll show you the right dishes.
-        </p>
-      </header>
+      </div>
+      <h1 className="mt-2 text-center text-3xl font-display leading-tight text-foreground sm:text-4xl">
+        What are you looking for?
+      </h1>
+      <p className="mt-2 text-center max-w-lg text-muted-foreground">
+        Tell us what you want and we'll show you the right dishes.
+      </p>
 
       <dl className="grid gap-4 sm:grid-cols-2">
         {INTENT_OPTIONS.map((intent) => (

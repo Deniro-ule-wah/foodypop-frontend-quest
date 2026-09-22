@@ -4,6 +4,7 @@ import { useState } from "react";
 import { login, register } from "@/lib/api/auth";
 import { useSession } from "@/lib/session";
 import { ErrorBlock, GapNotice } from "@/components/state";
+import { BrandLogo } from "@/components/brand-logo";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -40,6 +41,12 @@ function AuthPage() {
 
   return (
     <div className="mx-auto grid max-w-md gap-6">
+      <div className="flex items-center justify-center gap-3 text-center">
+        <BrandLogo size="sm" />
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+          FoodyPop
+        </p>
+      </div>
       <header className="grid gap-2">
         <h1 className="text-3xl text-foreground">
           {mode === "login" ? "Sign in" : "Create account"}

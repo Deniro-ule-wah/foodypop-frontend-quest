@@ -85,7 +85,7 @@ export function BrandLogo({ size = "md" }: { size?: "sm" | "md" | "lg" | "icon" 
         <span className="text-[#4F86C1]">P</span>
         <span className="text-[#4F86C1]">O</span>
         <span className="text-[#4F86C1]">P</span>
-      </Link>
+      </span>
     </Link>
   );
 }
