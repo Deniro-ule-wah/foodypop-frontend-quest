@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getDishFeed } from "@/lib/api/dishes";
 import { listCategories, listCuisines } from "@/lib/api/vendors";
 import { DishCard } from "@/components/dish-card";
@@ -55,6 +55,17 @@ const HUBS = [
 function HomePage() {
   const navigate = useNavigate();
   const [term, setTerm] = useState("");
+  const [intent, setIntent] = useState<string | null>(null);
+  const [intentReady, setIntentReady] = useState(false);
+
+  useEffect(() => {
+    try {
+      setIntent(window.sessionStorage.getItem("foodypop.intent"));
+    } catch {
+      /* ignore */
+    }
+    setIntentReady(true);
+  }, []);
 
   const feed = useQuery({
     queryKey: ["dishes", "feed", "hub"],
@@ -76,7 +87,33 @@ function HomePage() {
 
   return (
     <div className="grid gap-12">
-      <section className="rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-warm)] sm:p-12">
+      {/* Intent onboarding: show selector for first-time visitors. */}
+      {!intentReady ? (
+        <div className="flex justify-center py-12">
+          <div className="animate-pulse h-10 rounded-xl bg-muted" />
+        </div>
+      ) : !intent ? (
+        <IntentSelector
+          onChoose={(id) => {
+            try {
+              window.sessionStorage.setItem("foodypop.intent", id);
+            } catch {
+              /* ignore */
+            }
+            setIntent(id);
+          }}
+          onSkip={() => {
+            try {
+              window.sessionStorage.removeItem("foodypop.intent");
+            } catch {
+              /* ignore */
+            }
+            setIntent("discover");
+          }}
+        />
+      ) : intent === "vendor" ? null : (
+        <>
+          <section className="rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-warm)] sm:p-12">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Dish first</p>
         <h1 className="mt-3 max-w-2xl text-4xl leading-tight text-foreground sm:text-5xl">
           Discover food and drinks worth trying.
@@ -171,6 +208,8 @@ function HomePage() {
           kind="category"
         />
       </section>
+      </>
+      )}
     </div>
   );
 }
@@ -234,3 +273,106 @@ function TaxonomyPanel({
     </div>
   );
 }
+
+const INTENT_OPTIONS = [
+  {
+    id: "discover",
+    title: "Discover",
+    blurb: "Explore dishes and drinks.",
+    description: "Browse by cuisine, category, and taste. Find something new.",
+  },
+  {
+    id: "hungry",
+    title: "Hungry",
+    blurb: "Find something to eat now.",
+    description: "Filter by what's nearby, affordable, and available.",
+  },
+  {
+    id: "thirsty",
+    title: "Thirsty",
+    blurb: "Find something to drink.",
+    description: "Soda, tea, coffee, juice, milkshake — whatever you're craving.",
+  },
+  {
+    id: "vendor",
+    title: "Vendor",
+    blurb: "Manage your dishes and orders.",
+    description: "For food vendors: list dishes, accept orders, manage pickup.",
+  },
+];
+
+function IntentSelector({
+  onChoose,
+  onSkip,
+}: {
+  onChoose: (id: string) => void;
+  onSkip: () => void;
+}) {
+  return (
+    <div className="grid gap-6">
+      <header className="text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+          FoodyPop
+        </p>
+        <h1 className="mt-2 text-3xl font-display leading-tight text-foreground sm:text-4xl">
+          What are you looking for?
+        </h1>
+        <p className="mt-2 max-w-lg text-muted-foreground">
+          Tell us what you want and we'll show you the right dishes.
+        </p>
+      </header>
+
+      <dl className="grid gap-4 sm:grid-cols-2">
+        {INTENT_OPTIONS.map((intent) => (
+          <div
+            key={intent.id}
+            className="grid gap-3 rounded-2xl border border-border bg-card p-5 transition hover:shadow-[var(--shadow-warm)]"
+          >
+            <dd className="grid gap-2">
+              <dt className="text-xl font-semibold text-foreground">{intent.title}</dt>
+              <p className="text-sm text-muted-foreground">{intent.blurb}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{intent.description}</p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={() => onChoose(intent.id)}
+                >
+                  {intent.title}
+                </button>
+                {intent.id === "vendor" ? (
+                  <Link to="/vendors" className="btn-ghost">
+                    Go to vendors
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn-ghost"
+                    onClick={onSkip}
+                  >
+                    Skip
+                  </button>
+                )}
+              </div>
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      <p className="text-center text-sm text-muted-foreground">
+        <button
+          type="button"
+          className="underline hover:text-foreground"
+          onClick={onSkip}
+        >
+          Skip — show me everything
+        </button>
+      </p>
+
+      <p className="text-center text-xs text-muted-foreground">
+        Your choice is remembered for this browser session.
+      </p>
+    </div>
+  );
+}
+
