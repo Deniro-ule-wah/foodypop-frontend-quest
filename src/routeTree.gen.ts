@@ -14,11 +14,14 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CuisinesRouteImport } from './routes/cuisines'
 import { Route as DiagnosticsRouteImport } from './routes/diagnostics'
 import { Route as DrinksRouteImport } from './routes/drinks'
 import { Route as FoodRouteImport } from './routes/food'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as CuisineSlugRouteImport } from './routes/cuisine.$slug'
 import { Route as DishSlugRouteImport } from './routes/dish.$slug'
@@ -54,6 +57,11 @@ const CategoriesRoute = CategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CuisinesRoute = CuisinesRouteImport.update({
   id: '/cuisines',
   path: '/cuisines',
@@ -74,9 +82,19 @@ const FoodRoute = FoodRouteImport.update({
   path: '/food',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
@@ -131,11 +149,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
+  '/contact': typeof ContactRoute
   '/cuisines': typeof CuisinesRoute
   '/diagnostics': typeof DiagnosticsRoute
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
+  '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/cuisine/$slug': typeof CuisineSlugRoute
   '/dish/$slug': typeof DishSlugRoute
@@ -152,11 +173,14 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
+  '/contact': typeof ContactRoute
   '/cuisines': typeof CuisinesRoute
   '/diagnostics': typeof DiagnosticsRoute
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
+  '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/cuisine/$slug': typeof CuisineSlugRoute
   '/dish/$slug': typeof DishSlugRoute
@@ -174,11 +198,14 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
+  '/contact': typeof ContactRoute
   '/cuisines': typeof CuisinesRoute
   '/diagnostics': typeof DiagnosticsRoute
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
+  '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/cuisine/$slug': typeof CuisineSlugRoute
   '/dish/$slug': typeof DishSlugRoute
@@ -197,11 +224,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/categories'
+    | '/contact'
     | '/cuisines'
     | '/diagnostics'
     | '/drinks'
     | '/food'
+    | '/privacy'
     | '/search'
+    | '/terms'
     | '/category/$slug'
     | '/cuisine/$slug'
     | '/dish/$slug'
@@ -218,11 +248,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/categories'
+    | '/contact'
     | '/cuisines'
     | '/diagnostics'
     | '/drinks'
     | '/food'
+    | '/privacy'
     | '/search'
+    | '/terms'
     | '/category/$slug'
     | '/cuisine/$slug'
     | '/dish/$slug'
@@ -239,11 +272,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/categories'
+    | '/contact'
     | '/cuisines'
     | '/diagnostics'
     | '/drinks'
     | '/food'
+    | '/privacy'
     | '/search'
+    | '/terms'
     | '/category/$slug'
     | '/cuisine/$slug'
     | '/dish/$slug'
@@ -261,11 +297,14 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
   CategoriesRoute: typeof CategoriesRoute
+  ContactRoute: typeof ContactRoute
   CuisinesRoute: typeof CuisinesRoute
   DiagnosticsRoute: typeof DiagnosticsRoute
   DrinksRoute: typeof DrinksRoute
   FoodRoute: typeof FoodRoute
+  PrivacyRoute: typeof PrivacyRoute
   SearchRoute: typeof SearchRoute
+  TermsRoute: typeof TermsRoute
   CategorySlugRoute: typeof CategorySlugRoute
   CuisineSlugRoute: typeof CuisineSlugRoute
   DishSlugRoute: typeof DishSlugRoute
@@ -314,6 +353,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cuisines': {
       id: '/cuisines'
       path: '/cuisines'
@@ -342,11 +388,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FoodRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/category/$slug': {
@@ -421,11 +481,14 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,
   CategoriesRoute: CategoriesRoute,
+  ContactRoute: ContactRoute,
   CuisinesRoute: CuisinesRoute,
   DiagnosticsRoute: DiagnosticsRoute,
   DrinksRoute: DrinksRoute,
   FoodRoute: FoodRoute,
+  PrivacyRoute: PrivacyRoute,
   SearchRoute: SearchRoute,
+  TermsRoute: TermsRoute,
   CategorySlugRoute: CategorySlugRoute,
   CuisineSlugRoute: CuisineSlugRoute,
   DishSlugRoute: DishSlugRoute,
