@@ -46,7 +46,7 @@ async function safe<T>(fn: () => Promise<T>): Promise<T | null> {
   }
 }
 
-export const Route = createFileRoute("/sitemap/xml")({
+export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {

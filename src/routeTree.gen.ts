@@ -21,6 +21,7 @@ import { Route as DrinksRouteImport } from './routes/drinks'
 import { Route as FoodRouteImport } from './routes/food'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as CuisineSlugRouteImport } from './routes/cuisine.$slug'
@@ -92,6 +93,11 @@ const SearchRoute = SearchRouteImport.update({
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/food': typeof FoodRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/cuisine/$slug': typeof CuisineSlugRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/food': typeof FoodRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/cuisine/$slug': typeof CuisineSlugRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/food': typeof FoodRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/cuisine/$slug': typeof CuisineSlugRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/food'
     | '/privacy'
     | '/search'
+    | '/sitemap.xml'
     | '/terms'
     | '/category/$slug'
     | '/cuisine/$slug'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/food'
     | '/privacy'
     | '/search'
+    | '/sitemap.xml'
     | '/terms'
     | '/category/$slug'
     | '/cuisine/$slug'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/food'
     | '/privacy'
     | '/search'
+    | '/sitemap.xml'
     | '/terms'
     | '/category/$slug'
     | '/cuisine/$slug'
@@ -304,6 +316,7 @@ export interface RootRouteChildren {
   FoodRoute: typeof FoodRoute
   PrivacyRoute: typeof PrivacyRoute
   SearchRoute: typeof SearchRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   CategorySlugRoute: typeof CategorySlugRoute
   CuisineSlugRoute: typeof CuisineSlugRoute
@@ -402,6 +415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -488,6 +508,7 @@ const rootRouteChildren: RootRouteChildren = {
   FoodRoute: FoodRoute,
   PrivacyRoute: PrivacyRoute,
   SearchRoute: SearchRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   CategorySlugRoute: CategorySlugRoute,
   CuisineSlugRoute: CuisineSlugRoute,
