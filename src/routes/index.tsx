@@ -1,101 +1,175 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { getDishFeed } from "@/lib/api/dishes";
 import { listCategories, listCuisines } from "@/lib/api/vendors";
 import { DishCard } from "@/components/dish-card";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/state";
-import { useSession } from "@/lib/session";
+import { entitySlug } from "@/lib/slug";
+import { taxonomyId, taxonomyName } from "@/lib/taxonomy";
+import { breadcrumbList, jsonLd, seo, SITE_NAME, SITE_URL } from "@/lib/seo";
+import type { Taxonomy } from "@/lib/api/types";
+
+const TITLE = "FoodyPop — discover food and drinks worth trying";
+const DESCRIPTION =
+  "FoodyPop is dish-first food discovery: browse dishes and drinks from local vendors, explore cuisines and categories, and order what you find.";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "FoodyPop — Discover dishes, drinks and cuisines" },
-      {
-        name: "description",
-        content:
-          "Browse the FoodyPop dish feed, search food and drinks, and track orders against the live FoodyPop V2 backend.",
-      },
-      { property: "og:title", content: "FoodyPop — Discover dishes, drinks and cuisines" },
-      {
-        property: "og:description",
-        content: "Dish-first food discovery powered by the live FoodyPop V2 backend.",
-      },
-    ],
-  }),
-  component: DiscoveryPage,
+  head: () => {
+    const { meta, links } = seo({ title: TITLE, description: DESCRIPTION, path: "/" });
+    return {
+      meta,
+      links,
+      scripts: [
+        jsonLd({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: SITE_NAME,
+          url: SITE_URL,
+          description: DESCRIPTION,
+          potentialAction: {
+            "@type": "SearchAction",
+            target: {
+              "@type": "EntryPoint",
+              urlTemplate: `${SITE_URL}/search?q={search_term_string}`,
+            },
+            "query-input": "required name=search_term_string",
+          },
+        }),
+        jsonLd(breadcrumbList([{ name: "Home", path: "/" }])),
+      ],
+    };
+  },
+  component: HomePage,
 });
 
-function DiscoveryPage() {
-  const { ready } = useSession();
+const HUBS = [
+  { to: "/food", label: "Food", blurb: "Plates, grills and street food" },
+  { to: "/drinks", label: "Drinks", blurb: "Juices, brews and cocktails" },
+  { to: "/dishes", label: "All dishes", blurb: "Everything published so far" },
+  { to: "/cuisines", label: "Cuisines", blurb: "Browse by kitchen tradition" },
+  { to: "/categories", label: "Categories", blurb: "Browse by kind of dish" },
+  { to: "/vendors", label: "Vendors", blurb: "The kitchens behind the dishes" },
+] as const;
+
+function HomePage() {
+  const navigate = useNavigate();
+  const [term, setTerm] = useState("");
 
   const feed = useQuery({
-    queryKey: ["dishes", "feed"],
-    queryFn: ({ signal }) => getDishFeed({ limit: 24 }, signal),
-    enabled: ready,
+    queryKey: ["dishes", "feed", "hub"],
+    queryFn: ({ signal }) => getDishFeed({ limit: 48 }, signal),
     retry: false,
   });
 
   const cuisines = useQuery({
     queryKey: ["cuisines"],
     queryFn: ({ signal }) => listCuisines(signal),
-    enabled: ready,
     retry: false,
   });
 
   const categories = useQuery({
     queryKey: ["categories"],
     queryFn: ({ signal }) => listCategories(signal),
-    enabled: ready,
     retry: false,
   });
 
   return (
-    <div className="grid gap-10">
+    <div className="grid gap-12">
       <section className="rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-warm)] sm:p-12">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Dish first</p>
         <h1 className="mt-3 max-w-2xl text-4xl leading-tight text-foreground sm:text-5xl">
-          Find the food, not the feed.
+          Discover food and drinks worth trying.
         </h1>
         <p className="mt-4 max-w-xl text-muted-foreground">
-          Every dish, drink and cuisine below comes straight from the live FoodyPop backend. Nothing
-          is simulated here.
+          Start with the dish, not the restaurant. Search a plate you are craving, or browse by
+          cuisine and category — the vendor comes with the food.
         </p>
-        <div className="mt-6 flex flex-wrap gap-2">
-          <Link to="/search" className="btn-primary">
-            Search dishes
-          </Link>
-          <Link to="/vendors" className="btn-secondary">
-            Browse vendors
-          </Link>
-        </div>
+
+        <form
+          role="search"
+          className="mt-6 flex flex-wrap gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const q = term.trim();
+            if (q) navigate({ to: "/search", search: { q } });
+          }}
+        >
+          <label htmlFor="home-search" className="sr-only">
+            Search dishes and drinks
+          </label>
+          <input
+            id="home-search"
+            name="q"
+            type="search"
+            className="field w-full max-w-md"
+            placeholder="pilau, samosa, dawa cocktail…"
+            value={term}
+            onChange={(e) => setTerm(e.target.value)}
+          />
+          <button type="submit" className="btn-primary" disabled={term.trim().length === 0}>
+            Search
+          </button>
+        </form>
+      </section>
+
+      <section className="grid gap-4">
+        <h2 className="text-2xl text-foreground">Browse FoodyPop</h2>
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {HUBS.map((hub) => (
+            <li key={hub.to}>
+              <Link
+                to={hub.to}
+                className="block rounded-2xl border border-border bg-card p-4 transition-shadow hover:shadow-[var(--shadow-warm)]"
+              >
+                <h3 className="font-display text-lg text-foreground">{hub.label}</h3>
+                <p className="text-sm text-muted-foreground">{hub.blurb}</p>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="grid gap-4">
         <div className="flex items-baseline justify-between gap-4">
-          <h2 className="text-2xl text-foreground">Dish feed</h2>
-          <span className="font-mono text-xs text-muted-foreground">GET /dishes/feed</span>
+          <h2 className="text-2xl text-foreground">Latest dishes</h2>
+          <Link to="/dishes" className="text-sm underline">
+            See all
+          </Link>
         </div>
-        {!ready || feed.isPending ? (
+        {feed.isPending ? (
           <LoadingBlock label="Loading dishes" />
         ) : feed.isError ? (
           <ErrorBlock error={feed.error} onRetry={() => feed.refetch()} />
         ) : feed.data.items.length === 0 ? (
           <EmptyBlock
-            title="The backend returned no dishes"
-            hint="The feed responded successfully with an empty list. Nothing is substituted in its place."
+            title="No dishes published yet"
+            hint="FoodyPop returned an empty feed. Nothing is substituted in its place."
           />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {feed.data.items.map((dish) => (
-              <DishCard key={dish.id} dish={dish} />
+            {feed.data.items.slice(0, 12).map((dish, i) => (
+              <DishCard key={dish.id} dish={dish} priority={i < 3} />
             ))}
           </div>
         )}
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <TaxonomyPanel title="Cuisines" endpoint="GET /cuisines" query={cuisines} />
-        <TaxonomyPanel title="Categories" endpoint="GET /categories" query={categories} />
+        <TaxonomyPanel
+          title="Cuisines"
+          items={cuisines.data}
+          isPending={cuisines.isPending}
+          isError={cuisines.isError}
+          kind="cuisine"
+        />
+        <TaxonomyPanel
+          title="Categories"
+          items={categories.data}
+          isPending={categories.isPending}
+          isError={categories.isError}
+          kind="category"
+        />
       </section>
     </div>
   );
@@ -103,34 +177,55 @@ function DiscoveryPage() {
 
 function TaxonomyPanel({
   title,
-  endpoint,
-  query,
+  items,
+  isPending,
+  isError,
+  kind,
 }: {
   title: string;
-  endpoint: string;
-  query: ReturnType<typeof useQuery<Array<{ id?: string; name?: string }>>>;
+  items: Taxonomy[] | undefined;
+  isPending: boolean;
+  isError: boolean;
+  kind: "cuisine" | "category";
 }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="text-xl text-foreground">{title}</h2>
-        <span className="font-mono text-xs text-muted-foreground">{endpoint}</span>
+        <Link to={kind === "cuisine" ? "/cuisines" : "/categories"} className="text-sm underline">
+          All {title.toLowerCase()}
+        </Link>
       </div>
       <div className="mt-4">
-        {query.isPending ? (
+        {isPending ? (
           <p className="text-sm text-muted-foreground">Loading…</p>
-        ) : query.isError ? (
-          <ErrorBlock error={query.error} onRetry={() => query.refetch()} />
-        ) : !query.data || query.data.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Backend returned an empty list.</p>
+        ) : isError ? (
+          <p className="text-sm text-muted-foreground">
+            {title} could not be loaded right now. Try again shortly.
+          </p>
+        ) : !items || items.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Nothing published yet.</p>
         ) : (
           <ul className="flex flex-wrap gap-2">
-            {query.data.map((t, i) => (
-              <li
-                key={t.id ?? i}
-                className="rounded-full bg-muted px-3 py-1 text-sm text-foreground"
-              >
-                {t.name ?? t.id}
+            {items.map((t) => (
+              <li key={taxonomyId(t)}>
+                {kind === "cuisine" ? (
+                  <Link
+                    to="/cuisine/$slug"
+                    params={{ slug: entitySlug(taxonomyId(t), taxonomyName(t)) }}
+                    className="rounded-full bg-muted px-3 py-1 text-sm text-foreground hover:bg-accent"
+                  >
+                    {taxonomyName(t)}
+                  </Link>
+                ) : (
+                  <Link
+                    to="/category/$slug"
+                    params={{ slug: entitySlug(taxonomyId(t), taxonomyName(t)) }}
+                    className="rounded-full bg-muted px-3 py-1 text-sm text-foreground hover:bg-accent"
+                  >
+                    {taxonomyName(t)}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>
