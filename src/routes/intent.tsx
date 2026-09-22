@@ -68,13 +68,18 @@ function IntentPage() {
     setChosen(id);
   };
 
-  const handleSkip = () => {
+  const handleSkipCard = () => {
+    // Skip this card → go to home without setting an intent
+    navigate({ to: "/" });
+  };
+
+  const handleSkipAll = () => {
     try {
       window.sessionStorage.removeItem("foodypop.intent");
     } catch {
       /* ignore */
     }
-    setChosen("discover");
+    navigate({ to: "/" });
   };
 
   // Once chosen, navigate to the right place.
@@ -133,9 +138,9 @@ function IntentPage() {
                   <button
                     type="button"
                     className="btn-ghost"
-                    onClick={handleSkip}
+                    onClick={() => handleChoose(intent.id)}
                   >
-                    Skip
+                    Choose
                   </button>
                 )}
               </div>
@@ -148,7 +153,7 @@ function IntentPage() {
         <button
           type="button"
           className="underline hover:text-foreground"
-          onClick={handleSkip}
+          onClick={handleSkipAll}
         >
           Skip — show me everything
         </button>

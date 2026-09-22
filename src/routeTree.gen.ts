@@ -19,6 +19,7 @@ import { Route as CuisinesRouteImport } from './routes/cuisines'
 import { Route as DiagnosticsRouteImport } from './routes/diagnostics'
 import { Route as DrinksRouteImport } from './routes/drinks'
 import { Route as FoodRouteImport } from './routes/food'
+import { Route as IntentRouteImport } from './routes/intent'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -81,6 +82,11 @@ const DrinksRoute = DrinksRouteImport.update({
 const FoodRoute = FoodRouteImport.update({
   id: '/food',
   path: '/food',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntentRoute = IntentRouteImport.update({
+  id: '/intent',
+  path: '/intent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/diagnostics': typeof DiagnosticsRoute
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
+  '/intent': typeof IntentRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/diagnostics': typeof DiagnosticsRoute
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
+  '/intent': typeof IntentRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   '/diagnostics': typeof DiagnosticsRoute
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
+  '/intent': typeof IntentRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/diagnostics'
     | '/drinks'
     | '/food'
+    | '/intent'
     | '/privacy'
     | '/search'
     | '/sitemap.xml'
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/diagnostics'
     | '/drinks'
     | '/food'
+    | '/intent'
     | '/privacy'
     | '/search'
     | '/sitemap.xml'
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/diagnostics'
     | '/drinks'
     | '/food'
+    | '/intent'
     | '/privacy'
     | '/search'
     | '/sitemap.xml'
@@ -314,6 +326,7 @@ export interface RootRouteChildren {
   DiagnosticsRoute: typeof DiagnosticsRoute
   DrinksRoute: typeof DrinksRoute
   FoodRoute: typeof FoodRoute
+  IntentRoute: typeof IntentRoute
   PrivacyRoute: typeof PrivacyRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -399,6 +412,13 @@ declare module '@tanstack/react-router' {
       path: '/food'
       fullPath: '/food'
       preLoaderRoute: typeof FoodRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/intent': {
+      id: '/intent'
+      path: '/intent'
+      fullPath: '/intent'
+      preLoaderRoute: typeof IntentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -506,6 +526,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiagnosticsRoute: DiagnosticsRoute,
   DrinksRoute: DrinksRoute,
   FoodRoute: FoodRoute,
+  IntentRoute: IntentRoute,
   PrivacyRoute: PrivacyRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

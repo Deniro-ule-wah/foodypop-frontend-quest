@@ -114,10 +114,10 @@ function CartPage() {
               Subtotal:{" "}
               {subtotal === null ? (
                 <span className="text-muted-foreground">
-                  not available — the backend did not provide prices for every item
+                  Prices unavailable — the backend did not provide prices for every item
                 </span>
               ) : (
-                <strong>{subtotal.toLocaleString()}</strong>
+                <strong>{subtotal.toLocaleString()} KES</strong>
               )}
             </p>
             <div className="ml-auto flex gap-2">

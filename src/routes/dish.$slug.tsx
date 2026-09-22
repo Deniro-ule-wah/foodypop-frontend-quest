@@ -154,8 +154,10 @@ function DishDetail() {
   });
 
   // Determine the current user's active gesture from the dish's gestures array.
+  // Compares against user.id (the database user ID from the auth response),
+  // NOT against the raw JWT token string.
   const currentGesture: string | undefined = (() => {
-    if (!d.gestures) return undefined;
+    if (!d.gestures || !user?.id) return undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const arr = d.gestures as any[];
     if (!Array.isArray(arr)) return undefined;
@@ -166,7 +168,7 @@ function DishDetail() {
     return match?.type as string | undefined;
   })();
 
-  const name = dishDisplayName(d);
+  const displayName = dishDisplayName(d);
   const image = dishImage(d);
   const price = dishEffectivePrice(d);
   const cuisine = dishCuisine(d);
@@ -179,7 +181,10 @@ function DishDetail() {
       type="button"
       className="btn-ghost"
       disabled={unfollow.isPending}
-      onClick={() => unfollow.mutate({ targetType: "DISH", targetId: d.id })}
+      onClick={() => {
+        unfollow.mutate({ targetType: "DISH", targetId: d.id });
+        queryClient.invalidateQueries({ queryKey: ["follows"] });
+      }}
     >
       {unfollow.isPending ? "Unfollowing…" : "Unfollow"}
     </button>
@@ -188,11 +193,16 @@ function DishDetail() {
       type="button"
       className="btn-secondary"
       disabled={!token || follow.isPending}
-      onClick={() => follow.mutate({ targetType: "DISH", targetId: d.id })}
+      onClick={() => {
+        follow.mutate({ targetType: "DISH", targetId: d.id });
+        queryClient.invalidateQueries({ queryKey: ["follows"] });
+      }}
     >
       {follow.isPending ? "Following…" : "Follow dish"}
     </button>
   );
+
+  const name = dishDisplayName(d);
 
   return (
     <div className="grid gap-8">
@@ -200,7 +210,7 @@ function DishDetail() {
         crumbs={[
           { name: "Home", path: "/" },
           { name: "Dishes", path: "/dishes" },
-          { name, path: `/dish/${slug}` },
+          { name: displayName, path: `/dish/${slug}` },
         ]}
       />
 
@@ -209,7 +219,7 @@ function DishDetail() {
           {image ? (
             <img
               src={image}
-              alt={name}
+              alt={displayName}
               fetchPriority="high"
               className="h-full w-full object-cover"
             />
@@ -221,7 +231,7 @@ function DishDetail() {
         </div>
 
         <div className="grid content-start gap-4">
-          <h1 className="text-4xl text-foreground">{name}</h1>
+          <h1 className="text-4xl text-foreground">{displayName}</h1>
           {d.description ? <p className="text-muted-foreground">{d.description}</p> : null}
           {price !== null ? (
             <p className="text-2xl font-semibold text-primary">

@@ -57,6 +57,8 @@ function HomePage() {
   const [term, setTerm] = useState("");
   const [intent, setIntent] = useState<string | null>(null);
   const [intentReady, setIntentReady] = useState(false);
+  const [budget, setBudget] = useState<number | null>(null);
+  const [distance, setDistance] = useState<number | null>(null);
 
   useEffect(() => {
     try {
@@ -68,8 +70,8 @@ function HomePage() {
   }, []);
 
   const feed = useQuery({
-    queryKey: ["dishes", "feed", "hub"],
-    queryFn: ({ signal }) => getDishFeed({ limit: 48 }, signal),
+    queryKey: ["dishes", "feed", "hub", intent, budget],
+    queryFn: ({ signal }) => getDishFeed({ limit: 48, maxBudget: budget ?? undefined }, signal),
     retry: false,
   });
 
@@ -114,41 +116,83 @@ function HomePage() {
       ) : intent === "vendor" ? null : (
         <>
           <section className="rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-warm)] sm:p-12">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Dish first</p>
-        <h1 className="mt-3 max-w-2xl text-4xl leading-tight text-foreground sm:text-5xl">
-          Discover food and drinks worth trying.
-        </h1>
-        <p className="mt-4 max-w-xl text-muted-foreground">
-          Start with the dish, not the restaurant. Search a plate you are craving, or browse by
-          cuisine and category — the vendor comes with the food.
-        </p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Dish first</p>
+            <h1 className="mt-3 max-w-2xl text-4xl leading-tight text-foreground sm:text-5xl">
+              Discover food and drinks worth trying.
+            </h1>
+            <p className="mt-4 max-w-xl text-muted-foreground">
+              Start with the dish, not the restaurant. Search a plate you are craving, or browse by
+              cuisine and category — the vendor comes with the food.
+            </p>
 
-        <form
-          role="search"
-          className="mt-6 flex flex-wrap gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const q = term.trim();
-            if (q) navigate({ to: "/search", search: { q } });
-          }}
-        >
-          <label htmlFor="home-search" className="sr-only">
-            Search dishes and drinks
-          </label>
-          <input
-            id="home-search"
-            name="q"
-            type="search"
-            className="field w-full max-w-md"
-            placeholder="pilau, samosa, dawa cocktail…"
-            value={term}
-            onChange={(e) => setTerm(e.target.value)}
-          />
-          <button type="submit" className="btn-primary" disabled={term.trim().length === 0}>
-            Search
-          </button>
-        </form>
-      </section>
+            {/* Hungry intent: show budget + distance context */}
+            {intent === "hungry" ? (
+              <div className="mt-6 rounded-xl border border-border bg-muted/40 p-4">
+                <h2 className="text-sm font-semibold text-foreground">Hungry — find food near you</h2>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Filter by what fits your budget and how far you're willing to go.
+                </p>
+                <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Budget</p>
+                    <div className="mt-1 flex flex-wrap gap-2">
+                      {BUDGET_PRESETS.map((b) => (
+                        <button
+                          key={b.value}
+                          type="button"
+                          className={`rounded-full px-3 py-1 text-sm ${budget === b.value ? "btn-primary" : "btn-ghost"}`}
+                          onClick={() => setBudget(b.value)}
+                        >
+                          {b.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Distance</p>
+                    <div className="mt-1 flex flex-wrap gap-2">
+                      {DISTANCE_PRESETS.map((d) => (
+                        <button
+                          key={d.value}
+                          type="button"
+                          className={`rounded-full px-3 py-1 text-sm ${distance === d.value ? "btn-primary" : "btn-ghost"}`}
+                          onClick={() => setDistance(d.value)}
+                        >
+                          {d.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            <form
+              role="search"
+              className="mt-6 flex flex-wrap gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const q = term.trim();
+                if (q) navigate({ to: "/search", search: { q } });
+              }}
+            >
+              <label htmlFor="home-search" className="sr-only">
+                Search dishes and drinks
+              </label>
+              <input
+                id="home-search"
+                name="q"
+                type="search"
+                className="field w-full max-w-md"
+                placeholder="pilau, samosa, dawa cocktail…"
+                value={term}
+                onChange={(e) => setTerm(e.target.value)}
+              />
+              <button type="submit" className="btn-primary" disabled={term.trim().length === 0}>
+                Search
+              </button>
+            </form>
+          </section>
 
       <section className="grid gap-4">
         <h2 className="text-2xl text-foreground">Browse FoodyPop</h2>
@@ -273,6 +317,20 @@ function TaxonomyPanel({
     </div>
   );
 }
+
+const BUDGET_PRESETS = [
+  { label: "KES 250", value: 250 },
+  { label: "KES 500", value: 500 },
+  { label: "KES 1,000", value: 1000 },
+  { label: "KES 2,000+", value: 2000 },
+];
+
+const DISTANCE_PRESETS = [
+  { label: "Any distance", value: 0 },
+  { label: "Within 5 km", value: 5 },
+  { label: "Within 10 km", value: 10 },
+  { label: "Within 20 km", value: 20 },
+];
 
 const INTENT_OPTIONS = [
   {
