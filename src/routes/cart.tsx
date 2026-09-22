@@ -148,13 +148,17 @@ function CartPage() {
         </>
       )}
 
-      <GapNotice title="Checkout &amp; payment limits">
+      <GapNotice title="Checkout notes">
         <p>
           The exact <span className="font-mono">POST /orders</span> body is not documented by the
           backend; this client sends the cart items and shows the backend's own validation response
           unchanged.
         </p>
-        <p className="mt-2">{PAYMENT_CONTRACT_GAP}</p>
+        <p className="mt-2">
+          Payment is initiated through{' '}
+          <span className="font-mono">POST /orders/:id/payment-attempts</span> on the order detail
+          page after the order is created.
+        </p>
       </GapNotice>
     </div>
   );
