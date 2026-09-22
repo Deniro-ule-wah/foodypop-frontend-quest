@@ -8,6 +8,7 @@ import { ErrorBlock, GapNotice } from "@/components/state";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, nofollow" },
       { title: "Sign in — FoodyPop" },
       {
         name: "description",

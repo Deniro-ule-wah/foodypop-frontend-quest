@@ -1,20 +1,30 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { listVendors } from "@/lib/api/vendors";
+import { breadcrumbList, jsonLd, seo } from "@/lib/seo";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/state";
 
 export const Route = createFileRoute("/vendors/")({
-  head: () => ({
-    meta: [
-      { title: "Vendors — FoodyPop" },
-      {
-        name: "description",
-        content: "Vendors serving dishes on FoodyPop, listed from the live backend.",
-      },
-      { property: "og:title", content: "Vendors — FoodyPop" },
-      { property: "og:description", content: "Supporting vendor information for FoodyPop dishes." },
-    ],
-  }),
+  head: () => {
+    const { meta, links } = seo({
+      title: "Vendors on FoodyPop",
+      description:
+        "The kitchens and vendors publishing dishes on FoodyPop. Open a vendor to see who is behind the food you found.",
+      path: "/vendors",
+    });
+    return {
+      meta,
+      links,
+      scripts: [
+        jsonLd(
+          breadcrumbList([
+            { name: "Home", path: "/" },
+            { name: "Vendors", path: "/vendors" },
+          ]),
+        ),
+      ],
+    };
+  },
   component: VendorsPage,
 });
 

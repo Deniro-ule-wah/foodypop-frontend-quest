@@ -9,6 +9,7 @@ import { PAYMENT_CONTRACT_GAP } from "@/lib/api/payments";
 export const Route = createFileRoute("/orders/")({
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, nofollow" },
       { title: "Your orders — FoodyPop" },
       {
         name: "description",

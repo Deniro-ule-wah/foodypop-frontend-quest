@@ -10,6 +10,7 @@ import { EmptyBlock, ErrorBlock, GapNotice, LoadingBlock } from "@/components/st
 export const Route = createFileRoute("/orders/$orderId")({
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, nofollow" },
       { title: "Order detail — FoodyPop" },
       {
         name: "description",

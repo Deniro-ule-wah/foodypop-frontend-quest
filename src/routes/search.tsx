@@ -1,31 +1,37 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { searchDishes } from "@/lib/api/dishes";
-import { DishCard } from "@/components/dish-card";
-import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/state";
+import { DishGrid } from "@/components/dish-grid";
+import { EmptyBlock } from "@/components/state";
+import { seo } from "@/lib/seo";
 
+/**
+ * Search results are intentionally NOT indexable: an open query parameter
+ * would otherwise create unlimited thin URLs. The page stays fully usable.
+ */
 export const Route = createFileRoute("/search")({
-  head: () => ({
-    meta: [
-      { title: "Search dishes — FoodyPop" },
-      {
-        name: "description",
-        content: "Search FoodyPop dishes and drinks through the live backend search endpoint.",
-      },
-      { property: "og:title", content: "Search dishes — FoodyPop" },
-      {
-        property: "og:description",
-        content: "Search food and drinks against the FoodyPop V2 backend.",
-      },
-    ],
-  }),
+  validateSearch: (search: Record<string, unknown>): { q?: string } => {
+    const q = typeof search["q"] === "string" ? search["q"].slice(0, 100) : "";
+    return q ? { q } : {};
+  },
+  head: () => {
+    const { meta } = seo({
+      title: "Search dishes and drinks — FoodyPop",
+      description: "Search FoodyPop for a dish or drink by name.",
+      path: "/search",
+      noindex: true,
+    });
+    return { meta };
+  },
   component: SearchPage,
 });
 
 function SearchPage() {
-  const [input, setInput] = useState("");
-  const [term, setTerm] = useState("");
+  const { q } = Route.useSearch();
+  const navigate = useNavigate();
+  const term = q ?? "";
+  const [input, setInput] = useState(term);
 
   const results = useQuery({
     queryKey: ["dishes", "search", term],
@@ -39,15 +45,17 @@ function SearchPage() {
       <header className="grid gap-2">
         <h1 className="text-3xl text-foreground">Search</h1>
         <p className="text-sm text-muted-foreground">
-          Queries go to the backend search endpoint. There is no client-side substitute index.
+          Search across every dish and drink published on FoodyPop.
         </p>
       </header>
 
       <form
+        role="search"
         className="flex flex-wrap gap-2"
         onSubmit={(e) => {
           e.preventDefault();
-          setTerm(input.trim());
+          const next = input.trim();
+          navigate({ to: "/search", search: next ? { q: next } : {} });
         }}
       >
         <label htmlFor="q" className="sr-only">
@@ -55,6 +63,8 @@ function SearchPage() {
         </label>
         <input
           id="q"
+          name="q"
+          type="search"
           className="field max-w-md"
           placeholder="pilau, samosa, dawa cocktail…"
           value={input}
@@ -63,31 +73,25 @@ function SearchPage() {
         <button type="submit" className="btn-primary" disabled={input.trim().length === 0}>
           Search
         </button>
-        <span className="self-center font-mono text-xs text-muted-foreground">
-          GET /dishes/search
-        </span>
       </form>
 
       {term.length === 0 ? (
         <EmptyBlock
           title="Enter a search term"
-          hint="Nothing is requested from the backend until you search."
-        />
-      ) : results.isPending ? (
-        <LoadingBlock label="Searching" />
-      ) : results.isError ? (
-        <ErrorBlock error={results.error} onRetry={() => results.refetch()} />
-      ) : results.data.items.length === 0 ? (
-        <EmptyBlock
-          title={`No dishes matched “${term}”`}
-          hint="The backend returned an empty result set."
+          hint="Nothing is searched until you type a dish or drink name."
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {results.data.items.map((dish) => (
-            <DishCard key={dish.id} dish={dish} />
-          ))}
-        </div>
+        <>
+          <h2 className="text-xl text-foreground">Results for “{term}”</h2>
+          <DishGrid
+            dishes={results.data?.items}
+            isPending={results.isPending}
+            error={results.isError ? results.error : null}
+            onRetry={() => results.refetch()}
+            emptyTitle={`No dishes matched “${term}”`}
+            emptyHint="FoodyPop returned no results for this search."
+          />
+        </>
       )}
     </div>
   );

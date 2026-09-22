@@ -1,17 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getVendor } from "@/lib/api/vendors";
+import { seo } from "@/lib/seo";
 import { ErrorBlock, GapNotice, LoadingBlock } from "@/components/state";
 
 export const Route = createFileRoute("/vendors/$vendorId")({
-  head: () => ({
-    meta: [
-      { title: "Vendor — FoodyPop" },
-      { name: "description", content: "Vendor details served by the FoodyPop V2 backend." },
-      { property: "og:title", content: "Vendor — FoodyPop" },
-      { property: "og:description", content: "Vendor details served by the FoodyPop V2 backend." },
-    ],
-  }),
+  head: ({ params }) => {
+    const { meta, links } = seo({
+      title: "Vendor on FoodyPop",
+      description:
+        "A FoodyPop vendor page: who they are, where they are, and how their dishes reach you.",
+      path: `/vendors/${params.vendorId}`,
+    });
+    return { meta, links };
+  },
   component: VendorDetail,
 });
 
