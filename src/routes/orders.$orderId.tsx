@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { cancelOrder, getOrder } from "@/lib/api/orders";
+import { cancelOrder, createPaymentAttempt, getOrder, getPickupCode } from "@/lib/api/orders";
 import { ORDER_STATES } from "@/lib/api/types";
 import type { Order } from "@/lib/api/types";
 import { PAYMENT_CONTRACT_GAP, paymentStateCopy, readPaymentState } from "@/lib/api/payments";
@@ -42,6 +42,7 @@ function OrderDetailPage() {
   const { orderId } = Route.useParams();
   const { token, ready } = useSession();
   const queryClient = useQueryClient();
+  const [phoneValue, setPhoneValue] = useState("");
 
   const query = useQuery({
     queryKey: ["order", orderId, token],
@@ -54,6 +55,23 @@ function OrderDetailPage() {
     mutationFn: () => cancelOrder(orderId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["order", orderId] }),
   });
+
+  const initPayment = useMutation({
+    mutationFn: () =>
+      createPaymentAttempt(orderId, phoneValue, crypto.randomUUID()),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["order", orderId] }),
+  });
+
+  const pickupCodeQuery = useQuery({
+    queryKey: ["order", orderId, "pickup-code", token],
+    queryFn: ({ signal }) => getPickupCode(orderId, signal),
+    enabled: ready && Boolean(token) && currentStatus === "READY_FOR_PICKUP",
+    retry: false,
+  });
+
+  const pickupCode = pickupCodeQuery.data && typeof pickupCodeQuery.data === "object" && pickupCodeQuery.data !== null
+    ? (pickupCodeQuery.data as Record<string, unknown>).code ?? null
+    : null;
 
   const order = query.data;
   const currentStatus = order?.status ?? order?.state ?? null;
@@ -143,6 +161,58 @@ function OrderDetailPage() {
                 })}
               </ul>
             )}
+            {currentStatus === "PENDING_PAYMENT" && !token ? (
+              <p className="mt-3 text-sm text-muted-foreground">
+                Sign in to initiate payment for this order.
+              </p>
+            ) : currentStatus === "PENDING_PAYMENT" && token ? (
+              <form
+                className="mt-4 rounded-xl border border-border bg-muted/40 p-4"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!initPayment.isPending && phoneValue.trim().length >= 9) {
+                    initPayment.mutate();
+                  }
+                }}
+              >
+                <p className="text-sm text-muted-foreground">
+                  Initiate payment through the backend's payment-attempts endpoint.
+                </p>
+                <label className="mt-3 grid gap-1 text-sm">
+                  M-Pesa phone number
+                  <input
+                    className="field"
+                    type="tel"
+                    value={phoneValue}
+                    onChange={(e) => setPhoneValue(e.target.value)}
+                    placeholder="254712345678"
+                    autoComplete="tel-national"
+                    required
+                    minLength={9}
+                  />
+                </label>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {phoneValue.trim().length >= 9
+                    ? "Valid length"
+                    : phoneValue.length > 0
+                      ? "Need at least 9 digits"
+                      : "Enter your M-Pesa number"}
+                </p>
+                <button
+                  type="submit"
+                  className="btn-primary mt-3"
+                  disabled={initPayment.isPending || phoneValue.trim().length < 9}
+                >
+                  {initPayment.isPending ? "Initiating payment…" : "Initiate payment"}
+                </button>
+                {initPayment.isError ? <ErrorBlock error={initPayment.error} /> : null}
+                {initPayment.isSuccess ? (
+                  <p className="mt-3 text-sm text-foreground">
+                    Payment attempt initiated. Refresh to see the backend's recorded state.
+                  </p>
+                ) : null}
+              </form>
+            ) : null}
           </section>
 
           {order.items && order.items.length > 0 ? (
@@ -151,6 +221,68 @@ function OrderDetailPage() {
               <pre className="mt-3 overflow-x-auto rounded-xl bg-muted p-3 font-mono text-xs text-muted-foreground">
                 {JSON.stringify(order.items, null, 2)}
               </pre>
+            </section>
+          ) : null}
+
+          {currentStatus === "READY_FOR_PICKUP" && pickupCode ? (
+            <section className="rounded-2xl border border-border bg-card p-5">
+              <h2 className="text-lg text-foreground">Pickup code</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Show this code to the vendor when you arrive.
+              </p>
+              <div className="mt-4 flex items-center gap-3 rounded-xl border border-border bg-muted/40 p-4">
+                <p className="font-mono text-2xl font-bold text-foreground tracking-wider">
+                  {pickupCode}
+                </p>
+                <button
+                  type="button"
+                  className="ml-auto btn-secondary"
+                  onClick={() => {
+                    if (navigator.clipboard) {
+                      navigator.clipboard.writeText(pickupCode).then(
+                        () => {},
+                        () => {},
+                      );
+                    }
+                  }}
+                >
+                  Copy
+                </button>
+              </div>
+              <p className="mt-3 font-mono text-xs text-muted-foreground">
+                GET /orders/{"{"}id{"}"}/pickup-code
+              </p>
+            </section>
+          ) : null}
+
+          {currentStatus === "READY_FOR_PICKUP" && pickupCode ? (
+            <section className="rounded-2xl border border-border bg-card p-5">
+              <h2 className="text-lg text-foreground">Pickup code</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Show this code to the vendor when you arrive.
+              </p>
+              <div className="mt-4 flex items-center gap-3 rounded-xl border border-border bg-muted/40 p-4">
+                <p className="font-mono text-2xl font-bold text-foreground tracking-wider">
+                  {pickupCode}
+                </p>
+                <button
+                  type="button"
+                  className="ml-auto btn-secondary"
+                  onClick={() => {
+                    if (navigator.clipboard) {
+                      navigator.clipboard.writeText(pickupCode).then(
+                        () => {},
+                        () => {},
+                      );
+                    }
+                  }}
+                >
+                  Copy
+                </button>
+              </div>
+              <p className="mt-3 font-mono text-xs text-muted-foreground">
+                GET /orders/{"{"}id{"}"}/pickup-code
+              </p>
             </section>
           ) : null}
 

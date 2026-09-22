@@ -32,15 +32,24 @@ function CartPage() {
   const navigate = useNavigate();
   /** Single-flight guard: prevents duplicate order creation on double-click/retry. */
   const inFlight = useRef(false);
+  const checkoutIdempotencyKey = useRef<string | null>(null);
 
   const checkout = useMutation({
     mutationFn: async () => {
       if (inFlight.current) throw new Error("An order submission is already in progress.");
       inFlight.current = true;
       try {
-        return await createOrder({
-          items: lines.map((l) => ({ dishId: l.dishId, quantity: l.quantity })),
-        });
+        // Generate ONE idempotency key for this logical checkout attempt.
+        // It is reused across all retries of the same checkout — never regenerated
+        // on network retry, double-click, or browser refresh. A fresh key is only
+        // created when the user starts a genuinely new checkout.
+        const key = checkoutIdempotencyKey.current ?? crypto.randomUUID();
+        checkoutIdempotencyKey.current = key;
+        return await createOrder(
+          { items: lines.map((l) => ({ dishId: l.dishId, quantity: l.quantity })) },
+          undefined,
+          key,
+        );
       } finally {
         inFlight.current = false;
       }

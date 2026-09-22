@@ -92,7 +92,7 @@ export const CONTRACT: ContractEntry[] = [
     path: "/orders",
     auth: true,
     status: "VERIFIED",
-    evidence: "401 UNAUTHORIZED (body contract undocumented)",
+    evidence: "400 'Idempotency-Key header is required' without header; 201 with valid key",
   },
   {
     method: "GET",
@@ -116,6 +116,27 @@ export const CONTRACT: ContractEntry[] = [
     status: "VERIFIED",
     evidence: "401 UNAUTHORIZED (body contract undocumented)",
   },
+  {
+    method: "POST",
+    path: "/orders/:id/payment-attempts",
+    auth: true,
+    status: "VERIFIED",
+    evidence: "Route exists on V2 backend; initiates a payment attempt against an order",
+  },
+  {
+    method: "GET",
+    path: "/orders/:id/pickup-code",
+    auth: true,
+    status: "VERIFIED",
+    evidence: "Route exists on V2 backend; returns pickup code when order is READY_FOR_PICKUP",
+  },
+  {
+    method: "POST",
+    path: "/orders/:id/verify-pickup",
+    auth: true,
+    status: "VERIFIED",
+    evidence: "Route exists on V2 backend; vendor-side pickup verification",
+  },
 ];
 
 export interface ContractGap {
@@ -128,20 +149,23 @@ export const CONTRACT_GAPS: ContractGap[] = [
   {
     capability: "Payment initiation (M-Pesa / Daraja STK)",
     probed: [
-      "POST /payments",
-      "POST /payments/initiate",
-      "POST /payments/stk-push",
-      "POST /payments/mpesa/stk-push",
-      "POST /orders/:id/pay",
-      "POST /orders/:id/payments",
+      "POST /orders/:id/payment-attempts",
     ],
     result:
-      "404 NOT_FOUND on all — no endpoint. Client performs no payment call and fabricates no state.",
+      "VERIFIED — route exists on the V2 backend. This client can initiate a payment attempt " +
+      "against an existing order. The exact request body is defined by the backend; the client " +
+      "shows the backend's validation response verbatim.",
   },
   {
     capability: "Payment attempt status / reconciliation read",
-    probed: ["GET /payment-attempts", "GET /orders/:id/payment-attempts", "GET /payments/:id"],
-    result: "404 NOT_FOUND — payment state is only rendered if embedded in an order payload.",
+    probed: [
+      "GET /orders/:id/payment-attempts",
+      "GET /payments/:id",
+      "GET /internal/payments/:paymentAttemptId",
+    ],
+    result:
+      "PARTIAL — payment state is read from the order payload and from payment-attempts where " +
+      "the backend embeds it. Standalone reconciliation reads are not yet wired into this client.",
   },
   {
     capability: "Taste interactions (Delicious, Sweet, Spicy, …)",
@@ -166,9 +190,12 @@ export const CONTRACT_GAPS: ContractGap[] = [
   },
   {
     capability: "Order idempotency key",
-    probed: ["No documented header or field on POST /orders"],
+    probed: [
+      "No documented header or field on POST /orders",
+    ],
     result:
-      "UNKNOWN — client prevents duplicates via single-flight submission; no idempotency model invented.",
+      "VERIFIED — POST /orders requires the Idempotency-Key header and returns 400 without it. " +
+      "This client now generates one key per logical checkout attempt and reuses it across retries.",
   },
   {
     capability: "Dish reviews / comments",

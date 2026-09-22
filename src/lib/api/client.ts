@@ -87,6 +87,8 @@ export interface RequestOptions {
   query?: Record<string, string | number | undefined | null>;
   auth?: boolean;
   signal?: AbortSignal | undefined;
+  idempotencyKey?: string | undefined;
+  headers?: Record<string, string>;
 }
 
 function buildUrl(path: string, query?: RequestOptions["query"]): string {
@@ -100,9 +102,15 @@ function buildUrl(path: string, query?: RequestOptions["query"]): string {
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { method = "GET", body, query, auth = false, signal } = options;
+  const { method = "GET", body, query, auth = false, signal, idempotencyKey, headers: extraHeaders } = options;
   const headers: Record<string, string> = { accept: "application/json" };
   if (body !== undefined) headers["content-type"] = "application/json";
+  if (idempotencyKey) headers["Idempotency-Key"] = idempotencyKey;
+  if (extraHeaders) {
+    for (const [k, v] of Object.entries(extraHeaders)) {
+      if (v !== undefined && v !== null && v !== "") headers[k] = v;
+    }
+  }
   if (auth) {
     const token = tokenStore.get();
     if (token) headers["authorization"] = `Bearer ${token}`;

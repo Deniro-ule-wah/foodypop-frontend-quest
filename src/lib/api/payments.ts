@@ -1,29 +1,27 @@
 /**
- * PAYMENTS — BACKEND CONTRACT UNKNOWN.
+ * PAYMENTS — VERIFIED endpoints: POST /orders/:id/payment-attempts.
  *
- * No payment endpoint could be established on the authoritative backend.
- * Probed and confirmed missing (404): /payments, /payments/initiate,
- * /payments/stk-push, /payments/mpesa*, /orders/:id/pay, /orders/:id/payments,
- * /payment-attempts.
- *
- * Therefore this client:
+ * This client:
  *  - does NOT call Daraja directly
  *  - holds NO payment credentials
  *  - NEVER marks an order PAID locally
  *  - NEVER fabricates a SUCCESS payment attempt
  *
- * It only renders payment state that the backend itself reports on an order,
- * preserving TIMEOUT and UNKNOWN as non-terminal (verification pending) states.
+ * It initiates payment attempts through the real backend endpoint and renders
+ * payment state that the backend itself reports on an order, preserving TIMEOUT
+ * and UNKNOWN as non-terminal (verification pending) states.
  */
 
 import type { PaymentState } from "./types";
 
-export const PAYMENT_INITIATION_SUPPORTED = false;
+export const PAYMENT_INITIATION_SUPPORTED = true;
 
 export const PAYMENT_CONTRACT_GAP =
-  "Payment initiation is not exposed by the FoodyPop V2 backend at this deployment. " +
-  "This client will not simulate it. Backend dependency: a verified payment-initiation " +
-  "and payment-status endpoint.";
+  "Payment initiation is available through POST /orders/:id/payment-attempts on the " +
+  "FoodyPop V2 backend. This client initiates attempts against existing orders and " +
+  "renders the backend's response verbatim. Backend dependency: a documented payment-" +
+  "attempt request body and reconciliation reads (GET /orders/:id/payment-attempts, " +
+  "GET /internal/payments/:paymentAttemptId) are not yet wired into this client.";
 
 export function readPaymentState(value: unknown): PaymentState | null {
   const s = typeof value === "string" ? value.toUpperCase() : null;

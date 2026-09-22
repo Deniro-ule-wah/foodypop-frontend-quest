@@ -44,8 +44,8 @@ describe("auth payload reading", () => {
 });
 
 describe("payment safety", () => {
-  it("never claims payment initiation support", () => {
-    expect(PAYMENT_INITIATION_SUPPORTED).toBe(false);
+  it("initiates payment through the backend endpoint, never locally", () => {
+    expect(PAYMENT_INITIATION_SUPPORTED).toBe(true);
   });
 
   it("keeps TIMEOUT and UNKNOWN non-terminal", () => {
