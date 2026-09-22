@@ -73,8 +73,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "FoodyPop Web Client" },
-      { name: "description", content: "Browser client for the FoodyPop V2 backend." },
+      { title: "FoodyPop — discover food and drinks worth trying" },
+      {
+        name: "description",
+        content:
+          "FoodyPop is dish-first food discovery: browse dishes, drinks, cuisines and categories from local vendors.",
+      },
+      { property: "og:site_name", content: "FoodyPop" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
