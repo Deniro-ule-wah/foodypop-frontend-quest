@@ -7,6 +7,7 @@ import { ErrorBlock, LoadingBlock } from "@/components/state";
 export const Route = createFileRoute("/diagnostics")({
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, nofollow" },
       { title: "API diagnostics — FoodyPop" },
       {
         name: "description",
