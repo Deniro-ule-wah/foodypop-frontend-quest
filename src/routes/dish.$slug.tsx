@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
-import { getDish } from "@/lib/api/dishes";
-import { createFollow, UNFOLLOW_SUPPORTED } from "@/lib/api/follows";
+import { getDish, createGesture, TASTES } from "@/lib/api/dishes";
+import { createFollow, deleteFollow } from "@/lib/api/follows";
 import { ApiError } from "@/lib/api/client";
 import { ErrorBlock, GapNotice } from "@/components/state";
 import { Breadcrumbs } from "@/components/breadcrumbs";
@@ -12,20 +12,6 @@ import { entitySlug } from "@/lib/slug";
 import { idFromSlug } from "@/lib/slug";
 import { breadcrumbList, canonicalUrl, jsonLd, seo, SITE_NAME } from "@/lib/seo";
 import type { Dish } from "@/lib/api/types";
-
-/** Product taste vocabulary. FoodyPop has no taste reaction API yet. */
-const TASTES = [
-  "Delicious",
-  "Sweet",
-  "Bitter",
-  "Sour",
-  "Salty",
-  "Spicy",
-  "Refreshing",
-  "Crispy",
-  "Rich",
-  "Filling",
-];
 
 function truncate(value: string, max = 155): string {
   return value.length <= max ? value : `${value.slice(0, max - 1).trimEnd()}…`;
@@ -133,6 +119,28 @@ function DishDetail() {
     mutationFn: (dish: Dish) => createFollow({ targetType: "DISH", targetId: dish.id }),
   });
 
+  const unfollow = useMutation({
+    mutationFn: (dish: Dish) =>
+      deleteFollow({ targetType: "DISH", targetId: dish.id }),
+  });
+
+  const gesture = useMutation({
+    mutationFn: (type: string) => createGesture(d.id, type),
+  });
+
+  // Determine the current user's active gesture from the dish's gestures array.
+  const currentGesture: string | undefined = (() => {
+    if (!token || !d.gestures) return undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const arr = d.gestures as any[];
+    if (!Array.isArray(arr)) return undefined;
+    const match = arr.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (g: any) => (g.userId as string) === token || (g.user?.id as string) === token,
+    );
+    return match?.type as string | undefined;
+  })();
+
   const name = dishDisplayName(d);
   const image = dishImage(d);
   const price = dishEffectivePrice(d);
@@ -140,6 +148,26 @@ function DishDetail() {
   const category = dishCategory(d);
   const vendorName = d.vendor?.name || d.vendor?.displayName || null;
   const vendorId = (d.vendor?.id as string) || (d.vendorId as string) || null;
+
+  const followBtn = follow.isSuccess ? (
+    <button
+      type="button"
+      className="btn-ghost"
+      disabled={unfollow.isPending}
+      onClick={() => unfollow.mutate(d)}
+    >
+      {unfollow.isPending ? "Unfollowing…" : "Unfollow"}
+    </button>
+  ) : (
+    <button
+      type="button"
+      className="btn-secondary"
+      disabled={!token || follow.isPending}
+      onClick={() => follow.mutate(d)}
+    >
+      {follow.isPending ? "Following…" : "Follow dish"}
+    </button>
+  );
 
   return (
     <div className="grid gap-8">
@@ -175,19 +203,29 @@ function DishDetail() {
               {(d.currency as string) || "KES"} {price.toLocaleString()}
             </p>
           ) : null}
+          {typeof d.tasteScore === "number" && d.tasteScore > 0 ? (
+            <div className="mt-2 flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Taste score:</span>
+              <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-sm font-medium">
+                {d.tasteScore.toFixed(0)}
+                <span className="text-muted-foreground">/100</span>
+              </span>
+            </div>
+          ) : null}
 
           <div className="flex flex-wrap gap-2">
             <button type="button" className="btn-primary" onClick={() => add(d)}>
               Add to cart
             </button>
-            <button
-              type="button"
-              className="btn-secondary"
-              disabled={!token || follow.isPending}
-              onClick={() => follow.mutate(d)}
-            >
-              {follow.isPending ? "Following…" : "Follow dish"}
-            </button>
+            {token ? followBtn : (
+              <button
+                type="button"
+                className="btn-secondary"
+                disabled
+              >
+                Follow dish
+              </button>
+            )}
           </div>
           {!token ? (
             <p className="text-xs text-muted-foreground">
@@ -198,12 +236,10 @@ function DishDetail() {
             </p>
           ) : null}
           {follow.isError ? <ErrorBlock error={follow.error} /> : null}
+          {unfollow.isError ? <ErrorBlock error={unfollow.error} /> : null}
           {follow.isSuccess ? (
             <p className="text-sm text-[color:var(--color-success)]">Dish followed.</p>
           ) : null}
-          {UNFOLLOW_SUPPORTED ? null : (
-            <p className="text-xs text-muted-foreground">Unfollow is not available yet.</p>
-          )}
 
           <dl className="rounded-2xl border border-border bg-card p-4">
             <Field
@@ -278,19 +314,40 @@ function DishDetail() {
 
       <section className="grid gap-3">
         <h2 className="text-2xl text-foreground">Taste reactions</h2>
-        <GapNotice title="Taste reactions are not available yet">
-          FoodyPop does not record taste reactions from the web hub yet, so these are shown for
-          reference only and nothing is saved.
-        </GapNotice>
+        <p className="text-sm text-muted-foreground">
+          Show what this dish tastes like to you. Your reaction helps others discover it.
+        </p>
         <ul className="flex flex-wrap gap-2">
-          {TASTES.map((t) => (
-            <li key={t}>
-              <button type="button" className="btn-secondary text-xs" disabled>
-                {t}
-              </button>
-            </li>
-          ))}
+          {TASTES.map((t) => {
+            const active = currentGesture === t;
+            return (
+              <li key={t}>
+                <button
+                  type="button"
+                  className={`btn-secondary text-xs ${active ? "btn-primary" : ""}`}
+                  disabled={!token || gesture.isPending}
+                  onClick={() => gesture.mutate(t.toUpperCase())}
+                >
+                  {active ? `✓ ${t}` : t}
+                </button>
+              </li>
+            );
+          })}
         </ul>
+        {!token ? (
+          <p className="text-xs text-muted-foreground">
+            <Link to="/auth" className="underline">
+              Sign in
+            </Link>{" "}
+            to react to dishes.
+          </p>
+        ) : null}
+        {gesture.isError ? <ErrorBlock error={gesture.error} /> : null}
+        {gesture.isSuccess ? (
+          <p className="text-sm text-[color:var(--color-success)]">
+            Taste reaction recorded. Taste score updated.
+          </p>
+        ) : null}
       </section>
     </div>
   );

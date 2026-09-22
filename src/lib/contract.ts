@@ -169,14 +169,23 @@ export const CONTRACT_GAPS: ContractGap[] = [
   },
   {
     capability: "Taste interactions (Delicious, Sweet, Spicy, …)",
-    probed: ["GET/POST /dishes/:id/tastes", "POST /dishes/:id/taste", "GET /tastes"],
+    probed: ["POST /dishes/:id/gestures"],
     result:
-      "404 NOT_FOUND — taste actions are shown as unavailable, never persisted locally as success.",
+      "VERIFIED — POST /dishes/:id/gestures is wired into the dish detail page. " +
+      "Users can react with any of the 10 taste types. The backend replaces the " +
+      "user's previous gesture and returns the updated tasteScore.",
   },
   {
     capability: "Unfollow",
-    probed: ["DELETE /follows/:id", "POST /dishes/:id/follow"],
-    result: "404 NOT_FOUND — only follow creation and the follow list are exposed.",
+    probed: ["DELETE /follows"],
+    result:
+      "VERIFIED — DELETE /follows is wired into the dish detail page. " +
+      "Toggles between follow/unfollow when the user is authenticated.",
+  },
+  {
+    capability: "POST /vendors",
+    probed: ["POST /vendors"],
+    result: "NOT IMPLEMENTED — vendor creation flow not yet built in the web client.",
   },
   {
     capability: "Current session / profile read",
