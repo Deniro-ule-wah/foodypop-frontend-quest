@@ -12,4 +12,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  nitro: {
+    // Vercel cannot run Cloudflare Worker bundles — pin the preset to Vercel's
+    // Node.js serverless runtime so the .output/ layout Vercel expects is produced.
+    preset: "vercel",
+  },
 });
