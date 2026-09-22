@@ -127,12 +127,80 @@ function RootComponent() {
               {/* Required: nested routes render here. */}
               <Outlet />
             </main>
-            <footer className="border-t border-border px-4 py-6">
-              <div className="mx-auto max-w-6xl text-xs text-muted-foreground">
-                FoodyPop web client · backend: <span className="font-mono">{API_BASE_URL}</span> ·{" "}
+            <footer className="border-t border-border px-4 py-8">
+              <div className="mx-auto grid max-w-6xl gap-6 text-sm sm:grid-cols-3">
+                <nav aria-label="Discover">
+                  <h2 className="font-display text-base text-foreground">Discover</h2>
+                  <ul className="mt-2 grid gap-1 text-muted-foreground">
+                    <li>
+                      <Link to="/dishes" className="hover:underline">
+                        All dishes
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/food" className="hover:underline">
+                        Food
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/drinks" className="hover:underline">
+                        Drinks
+                      </Link>
+                    </li>
+                  </ul>
+                </nav>
+                <nav aria-label="Browse">
+                  <h2 className="font-display text-base text-foreground">Browse</h2>
+                  <ul className="mt-2 grid gap-1 text-muted-foreground">
+                    <li>
+                      <Link to="/cuisines" className="hover:underline">
+                        Cuisines
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/categories" className="hover:underline">
+                        Categories
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/vendors" className="hover:underline">
+                        Vendors
+                      </Link>
+                    </li>
+                  </ul>
+                </nav>
+                <nav aria-label="FoodyPop">
+                  <h2 className="font-display text-base text-foreground">FoodyPop</h2>
+                  <ul className="mt-2 grid gap-1 text-muted-foreground">
+                    <li>
+                      <Link to="/about" className="hover:underline">
+                        About
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/contact" className="hover:underline">
+                        Contact
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/privacy" className="hover:underline">
+                        Privacy
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/terms" className="hover:underline">
+                        Terms
+                      </Link>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+              <div className="mx-auto mt-6 max-w-6xl text-xs text-muted-foreground">
+                FoodyPop · service status:{" "}
                 <Link to="/diagnostics" className="underline">
-                  API diagnostics
-                </Link>
+                  diagnostics
+                </Link>{" "}
+                · <span className="font-mono">{API_BASE_URL}</span>
               </div>
             </footer>
           </div>
