@@ -1,7 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getDish, getDishFeed, createGesture, TASTES } from "@/lib/api/dishes";
-import { createFollow, deleteFollow, listFollows } from "@/lib/api/follows";
+import { getDish, getDishFeed } from "@/lib/api/dishes";
 import { ApiError } from "@/lib/api/client";
 import { DishPopViewport } from "@/components/dish-pop";
 import { Breadcrumbs } from "@/components/breadcrumbs";

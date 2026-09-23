@@ -1,11 +1,11 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Link } from "@tanstack/react-router";
 import { createGesture, TASTES } from "@/lib/api/dishes";
 import { createFollow, deleteFollow, listFollows } from "@/lib/api/follows";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { dishDisplayName, dishEffectivePrice, useCart } from "@/lib/cart";
 import { dishImage, dishCuisine, dishCategory } from "@/lib/taxonomy";
-import { DishMedia, DishIdentity } from "@/components/dish-media";
+import { DishMedia, DishIdentity, buildMediaList } from "@/components/dish-media";
 import { EmptyBlock } from "@/components/state";
 import { useSession } from "@/lib/session";
 import type { Dish } from "@/lib/api/types";
@@ -32,7 +32,6 @@ interface PopViewportProps {
  * Vendor/social information stays subordinate to the dish.
  */
 export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUpdate }: PopViewportProps) {
-  const navigate = useNavigate();
   const { add } = useCart();
   const { token, user } = useSession();
   const queryClient = useQueryClient();
@@ -50,8 +49,8 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
     select: (data: unknown) => {
       if (!data || typeof data !== "object") return new Set<string>();
       const body = data as Record<string, unknown>;
-      const items = (body.items as Array<Record<string, unknown>>) ?? [];
-      return new Set(items.filter((f) => f.targetType === "DISH").map((f) => f.targetId as string));
+      const items = (body["items"] as Array<Record<string, unknown>>) ?? [];
+      return new Set(items.filter((f) => f["targetType"] === "DISH").map((f) => f["targetId"] as string));
     },
   });
 
@@ -70,8 +69,12 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
 
   // Taste gesture mutation — uses the real createGesture API
   const gesture = useMutation({
-    mutationFn: (type: string) => createGesture(dish.id, type),
+    mutationFn: (type: string) => {
+      if (!dish) return Promise.reject(new Error("No dish"));
+      return createGesture(dish.id, type);
+    },
     onSuccess: () => {
+      if (!dish) return;
       queryClient.invalidateQueries({ queryKey: ["dish", dish.id] });
       onDishUpdate?.(dish);
     },
@@ -80,7 +83,7 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
   const name = dish ? dishDisplayName(dish) : "";
   const image = dish ? dishImage(dish) : null;
   const price = dish ? dishEffectivePrice(dish) : null;
-  const tasteScore = dish ? (dish.tasteScore as number | undefined) : undefined;
+  const tasteScore = dish ? (dish["tasteScore"] as number | undefined) : undefined;
   const cuisine = dish ? dishCuisine(dish) : null;
   const category = dish ? dishCategory(dish) : null;
   const vendorName = dish ? (dish.vendor?.name || dish.vendor?.displayName || null) : null;
@@ -88,8 +91,8 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
 
   // Current user's active gesture — derived from backend d.gestures filtered by user.id
   const currentGesture = dish && user?.id ? (() => {
-    if (!dish.gestures || !Array.isArray(dish.gestures)) return undefined;
-    const match = dish.gestures.find((g: unknown) => {
+    if (!dish["gestures"] || !Array.isArray(dish["gestures"])) return undefined;
+    const match = dish["gestures"].find((g: unknown) => {
       const gAny = g as { userId?: string; type?: string };
       return gAny.userId === user.id && typeof gAny.type === "string";
     });
@@ -115,11 +118,26 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
 
   if (!dish) return <EmptyBlock title="No dish selected" hint="Nothing to show here." />;
 
+  // Reset media index when navigating to a different dish
+  const prevIndexRef = useRef(currentIndex);
+  useEffect(() => {
+    if (currentIndex !== prevIndexRef.current) {
+      setActiveMediaIndex(0);
+      prevIndexRef.current = currentIndex;
+    }
+  }, [currentIndex]);
+  useEffect(() => {
+    if (!dish) return;
+    if (activeMediaIndex >= buildMediaList(dish).length) {
+      setActiveMediaIndex(0);
+    }
+  }, [dish?.id, activeMediaIndex]);
+
   return (
     <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:gap-10">
       {/* LEFT COLUMN: Media + basic info */}
       <div className="grid gap-4">
-        <DishMedia dish={dish} onMediaChange={setActiveMediaIndex} />
+        <DishMedia dish={dish} activeIndex={activeMediaIndex} setActiveIndex={setActiveMediaIndex} />
         <div className="grid gap-2">
           <h1 className="text-3xl font-display leading-tight text-foreground">{name}</h1>
           <DishIdentity dish={dish} />
