@@ -1,9 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getDish, createGesture, TASTES } from "@/lib/api/dishes";
+import { getDish, getDishFeed, createGesture, TASTES } from "@/lib/api/dishes";
 import { createFollow, deleteFollow, listFollows } from "@/lib/api/follows";
 import { ApiError } from "@/lib/api/client";
-import { ErrorBlock, GapNotice } from "@/components/state";
+import { DishPop } from "@/components/dish-pop";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { dishDisplayName, dishEffectivePrice, useCart } from "@/lib/cart";
 import { useSession } from "@/lib/session";
@@ -52,7 +52,13 @@ export const Route = createFileRoute("/dish/$slug")({
   loader: async ({ params }) => {
     try {
       const dish = await getDish(idFromSlug(params.slug));
-      return { dish };
+      let feed: { items: Dish[]; nextCursor: string | null; hasMore: boolean } | null = null;
+      try {
+        feed = await getDishFeed({ limit: 24 });
+      } catch {
+        // Feed optional — navigation degrades gracefully
+      }
+      return { dish, feed };
     } catch (error) {
       if (error instanceof ApiError && error.kind === "not_found") throw notFound();
       throw error;
