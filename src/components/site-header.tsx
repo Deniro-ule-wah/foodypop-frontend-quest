@@ -1,8 +1,8 @@
 import { Link, useNavigate, useLocation } from "@tanstack/react-router";
+import { BrandLogo } from "@/components/brand-logo";
 import { useState } from "react";
 import { useCart } from "@/lib/cart";
 import { useSession } from "@/lib/session";
-import { BrandLogo } from "./brand-logo";
 
 const NAV = [
   { to: "/dishes", label: "Dishes" },
@@ -13,64 +13,6 @@ const NAV = [
   { to: "/vendors", label: "Vendors" },
   { to: "/search", label: "Search" },
 ] as const;
-
-function BrandLogo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
-  // From the supplied FoodyPop V2 logo asset:
-  // Wordmark: FOODYPOP in bold rounded sans-serif, uppercase
-  // Colors: mustard yellow (F,O,O,D) / taupe (Y) / medium blue (P,O,P)
-  // The icon is a rounded square with a white F/P monogram over a yellow→blue diagonal gradient.
-  // We render the wordmark inline to keep it crisp at every size and avoid
-  // loading a raster asset for the logo.
-
-  const scale = size === "sm" ? 0.85 : size === "lg" ? 1.15 : 1;
-  const textScale = size === "sm" ? "text-lg" : size === "lg" ? "text-2xl" : "text-xl";
-  const iconSize = size === "sm" ? 22 : size === "lg" ? 34 : 28;
-
-  return (
-    <Link
-      to="/"
-      className="inline-flex items-center gap-2 font-display font-semibold tracking-tight text-foreground no-underline transition-colors hover:text-foreground"
-      aria-label="FoodyPop home"
-    >
-      {/* Standalone icon mark — rounded square with diagonal gradient + white F/P glyph */}
-      <span
-        aria-hidden="true"
-        className="flex items-center justify-center rounded-full bg-gradient-to-br from-amber-500 via-yellow-400 to-blue-500"
-        style={{ width: iconSize, height: iconSize, flexShrink: 0 }}
-      >
-        {/* White monogram glyph approximating the F/P mark from the logo */}
-        <svg
-          width={size === "sm" ? 14 : size === "lg" ? 22 : 18}
-          height={size === "sm" ? 14 : size === "lg" ? 22 : 18}
-          viewBox="0 0 24 24"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M7 6h3l3 4 3-4h3v9h-3v-5l-3 4-3-4h-3v-4h3m3 4h3v4h-3v-4m-6 0h3v4h-3v-4m0 4h4v4h-4v-4"
-            fill="currentColor"
-            className="text-white"
-          />
-        </svg>
-      </span>
-
-      {/* Wordmark: FOODYPOP — mustard/taupe/blue per the supplied asset */}
-      <span
-        className={textScale}
-        style={{ transform: `scale(${scale})`, transformOrigin: "top left" }}
-      >
-        <span className="text-[#F5A623]">F</span>
-        <span className="text-[#F5A623]">O</span>
-        <span className="text-[#F5A623]">O</span>
-        <span className="text-[#F5A623]">D</span>
-        <span className="text-[#C9B896]">Y</span>
-        <span className="text-[#4F86C1]">P</span>
-        <span className="text-[#4F86C1]">O</span>
-        <span className="text-[#4F86C1]">P</span>
-      </span>
-    </Link>
-  );
-}
 
 export function SiteHeader() {
   const { count } = useCart();

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { getDishFeed } from "@/lib/api/dishes";
 import { listCategories, listCuisines } from "@/lib/api/vendors";
 import { DishCard } from "@/components/dish-card";
+import { BrandLogo } from "@/components/brand-logo";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/state";
 import { entitySlug } from "@/lib/slug";
 import { taxonomyId, taxonomyName } from "@/lib/taxonomy";
