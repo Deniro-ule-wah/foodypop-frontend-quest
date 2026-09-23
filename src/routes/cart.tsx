@@ -46,7 +46,11 @@ function CartPage() {
         const key = checkoutIdempotencyKey.current ?? crypto.randomUUID();
         checkoutIdempotencyKey.current = key;
         return await createOrder(
-          { items: lines.map((l) => ({ dishId: l.dishId, quantity: l.quantity })) },
+          {
+            vendorId: lines[0]?.vendorId,
+            fulfillmentMode: "PICKUP",
+            items: lines.map((l) => ({ offeringId: l.dishId, quantity: l.quantity })),
+          },
           undefined,
           key,
         );
