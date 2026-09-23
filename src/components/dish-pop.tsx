@@ -38,8 +38,10 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
 
-  const dish = feedItems[currentIndex];
-  const total = feedItems.length;
+  // Use feedItems as the navigation list, falling back to [initialDish] when feed is empty
+  const navItems = feedItems.length > 0 ? feedItems : [initialDish];
+  const dish = navItems[currentIndex];
+  const total = navItems.length;
 
   // Server-authoritative follow state
   const followQuery = useQuery({
@@ -125,13 +127,13 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
       setActiveMediaIndex(0);
       prevIndexRef.current = currentIndex;
     }
-  }, [currentIndex]);
+  }, [currentIndex, navItems.length]);
   useEffect(() => {
     if (!dish) return;
     if (activeMediaIndex >= buildMediaList(dish).length) {
       setActiveMediaIndex(0);
     }
-  }, [dish?.id, activeMediaIndex]);
+  }, [dish?.id, activeMediaIndex, navItems.length]);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:gap-10">
