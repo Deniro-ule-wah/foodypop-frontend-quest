@@ -120,7 +120,9 @@ function HomePage() {
       ) : intent === "vendor" ? null : (
         <>
           <section className="rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-warm)] sm:p-12">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Dish first</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              Dish first
+            </p>
             <h1 className="mt-3 max-w-2xl text-4xl leading-tight text-foreground sm:text-5xl">
               Discover food and drinks worth trying.
             </h1>
@@ -132,7 +134,9 @@ function HomePage() {
             {/* Hungry intent: show budget + distance context */}
             {intent === "hungry" ? (
               <div className="mt-6 rounded-xl border border-border bg-muted/40 p-4">
-                <h2 className="text-sm font-semibold text-foreground">Hungry — find food near you</h2>
+                <h2 className="text-sm font-semibold text-foreground">
+                  Hungry — find food near you
+                </h2>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Filter by what fits your budget and how far you're willing to go.
                 </p>
@@ -198,65 +202,65 @@ function HomePage() {
             </form>
           </section>
 
-      <section className="grid gap-4">
-        <h2 className="text-2xl text-foreground">Browse FoodyPop</h2>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {HUBS.map((hub) => (
-            <li key={hub.to}>
-              <Link
-                to={hub.to}
-                className="block rounded-2xl border border-border bg-card p-4 transition-shadow hover:shadow-[var(--shadow-warm)]"
-              >
-                <h3 className="font-display text-lg text-foreground">{hub.label}</h3>
-                <p className="text-sm text-muted-foreground">{hub.blurb}</p>
+          <section className="grid gap-4">
+            <h2 className="text-2xl text-foreground">Browse FoodyPop</h2>
+            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {HUBS.map((hub) => (
+                <li key={hub.to}>
+                  <Link
+                    to={hub.to}
+                    className="block rounded-2xl border border-border bg-card p-4 transition-shadow hover:shadow-[var(--shadow-warm)]"
+                  >
+                    <h3 className="font-display text-lg text-foreground">{hub.label}</h3>
+                    <p className="text-sm text-muted-foreground">{hub.blurb}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="grid gap-4">
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 className="text-2xl text-foreground">Latest dishes</h2>
+              <Link to="/dishes" className="text-sm underline">
+                See all
               </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+            </div>
+            {feed.isPending ? (
+              <LoadingBlock label="Loading dishes" />
+            ) : feed.isError ? (
+              <ErrorBlock error={feed.error} onRetry={() => feed.refetch()} />
+            ) : feed.data.items.length === 0 ? (
+              <EmptyBlock
+                title="No dishes published yet"
+                hint="FoodyPop returned an empty feed. Nothing is substituted in its place."
+              />
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {feed.data.items.slice(0, 12).map((dish, i) => (
+                  <DishCard key={dish.id} dish={dish} priority={i < 3} />
+                ))}
+              </div>
+            )}
+          </section>
 
-      <section className="grid gap-4">
-        <div className="flex items-baseline justify-between gap-4">
-          <h2 className="text-2xl text-foreground">Latest dishes</h2>
-          <Link to="/dishes" className="text-sm underline">
-            See all
-          </Link>
-        </div>
-        {feed.isPending ? (
-          <LoadingBlock label="Loading dishes" />
-        ) : feed.isError ? (
-          <ErrorBlock error={feed.error} onRetry={() => feed.refetch()} />
-        ) : feed.data.items.length === 0 ? (
-          <EmptyBlock
-            title="No dishes published yet"
-            hint="FoodyPop returned an empty feed. Nothing is substituted in its place."
-          />
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {feed.data.items.slice(0, 12).map((dish, i) => (
-              <DishCard key={dish.id} dish={dish} priority={i < 3} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-2">
-        <TaxonomyPanel
-          title="Cuisines"
-          items={cuisines.data}
-          isPending={cuisines.isPending}
-          isError={cuisines.isError}
-          kind="cuisine"
-        />
-        <TaxonomyPanel
-          title="Categories"
-          items={categories.data}
-          isPending={categories.isPending}
-          isError={categories.isError}
-          kind="category"
-        />
-      </section>
-      </>
+          <section className="grid gap-4 md:grid-cols-2">
+            <TaxonomyPanel
+              title="Cuisines"
+              items={cuisines.data}
+              isPending={cuisines.isPending}
+              isError={cuisines.isError}
+              kind="cuisine"
+            />
+            <TaxonomyPanel
+              title="Categories"
+              items={categories.data}
+              isPending={categories.isPending}
+              isError={categories.isError}
+              kind="category"
+            />
+          </section>
+        </>
       )}
     </div>
   );

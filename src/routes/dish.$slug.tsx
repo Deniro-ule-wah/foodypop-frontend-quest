@@ -128,7 +128,9 @@ function DishDetail() {
       if (!data || typeof data !== "object") return new Set<string>();
       const body = data as Record<string, unknown>;
       const items = (body["items"] as Array<Record<string, unknown>>) ?? [];
-      return new Set(items.filter((f) => f["targetType"] === "DISH").map((f) => f["targetId"] as string));
+      return new Set(
+        items.filter((f) => f["targetType"] === "DISH").map((f) => f["targetId"] as string),
+      );
     },
   });
 
@@ -248,21 +250,17 @@ function DishDetail() {
               </span>
             </div>
           ) : (
-            <p className="mt-2 text-sm text-muted-foreground">
-              Taste score — not enough data yet
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">Taste score — not enough data yet</p>
           )}
 
           <div className="flex flex-wrap gap-2">
             <button type="button" className="btn-primary" onClick={() => add(d)}>
               Add to cart
             </button>
-            {token ? followBtn : (
-              <button
-                type="button"
-                className="btn-secondary"
-                disabled
-              >
+            {token ? (
+              followBtn
+            ) : (
+              <button type="button" className="btn-secondary" disabled>
                 Follow dish
               </button>
             )}

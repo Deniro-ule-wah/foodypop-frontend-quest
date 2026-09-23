@@ -58,8 +58,7 @@ function OrderDetailPage() {
   });
 
   const initPayment = useMutation({
-    mutationFn: () =>
-      createPaymentAttempt(orderId, phoneValue, crypto.randomUUID()),
+    mutationFn: () => createPaymentAttempt(orderId, phoneValue, crypto.randomUUID()),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["order", orderId] }),
   });
 

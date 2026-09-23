@@ -148,9 +148,7 @@ export interface ContractGap {
 export const CONTRACT_GAPS: ContractGap[] = [
   {
     capability: "Payment initiation (M-Pesa / Daraja STK)",
-    probed: [
-      "POST /orders/:id/payment-attempts",
-    ],
+    probed: ["POST /orders/:id/payment-attempts"],
     result:
       "VERIFIED — route exists on the V2 backend. This client can initiate a payment attempt " +
       "against an existing order. The exact request body is defined by the backend; the client " +
@@ -199,9 +197,7 @@ export const CONTRACT_GAPS: ContractGap[] = [
   },
   {
     capability: "Order idempotency key",
-    probed: [
-      "No documented header or field on POST /orders",
-    ],
+    probed: ["No documented header or field on POST /orders"],
     result:
       "VERIFIED — POST /orders requires the Idempotency-Key header and returns 400 without it. " +
       "This client now generates one key per logical checkout attempt and reuses it across retries.",

@@ -24,13 +24,7 @@ export function BrandLogo({ size = "md" }: { size?: "sm" | "md" | "lg" | "icon" 
         aria-hidden="true"
         className="inline-flex items-center justify-center rounded-full bg-gradient-to-br from-amber-500 via-yellow-400 to-blue-500"
       >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          aria-hidden="true"
-        >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path
             d="M7 6h3l3 4 3-4h3v9h-3v-5l-3 4-3-4h-3v-4h3m3 4h3v4h-3v-4m-6 0h3v4h-3v-4m0 4h4v4h-4v-4"
             fill="currentColor"

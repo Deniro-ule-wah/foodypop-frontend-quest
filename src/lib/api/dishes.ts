@@ -20,18 +20,21 @@ export function getDishFeed(
   params: { cuisines?: string[]; categories?: string[]; cursor?: string; limit?: number } = {},
   signal?: AbortSignal,
 ) {
-  return apiRequest<{ items: Dish[]; nextCursor: string | null; hasMore: boolean }>("/dishes/feed", {
-    query: {
-      limit: params.limit ?? 48,
-      cursor: params.cursor,
-      // Arrays are sent as comma-separated values; the backend's own filter
-      // format is unconfirmed, so nothing else is added to the query.
-      cuisines: params.cuisines?.length ? params.cuisines.join(",") : undefined,
-      categories: params.categories?.length ? params.categories.join(",") : undefined,
+  return apiRequest<{ items: Dish[]; nextCursor: string | null; hasMore: boolean }>(
+    "/dishes/feed",
+    {
+      query: {
+        limit: params.limit ?? 48,
+        cursor: params.cursor,
+        // Arrays are sent as comma-separated values; the backend's own filter
+        // format is unconfirmed, so nothing else is added to the query.
+        cuisines: params.cuisines?.length ? params.cuisines.join(",") : undefined,
+        categories: params.categories?.length ? params.categories.join(",") : undefined,
+      },
+      auth: true,
+      signal,
     },
-    auth: true,
-    signal,
-  });
+  );
 }
 
 /** VERIFIED: GET /dishes/search */
@@ -39,11 +42,14 @@ export function searchDishes(
   params: { q?: string; cursor?: string; limit?: number },
   signal?: AbortSignal,
 ) {
-  return apiRequest<{ items: Dish[]; nextCursor: string | null; hasMore: boolean }>("/dishes/search", {
-    query: { q: params.q, limit: params.limit ?? 24 },
-    auth: true,
-    signal,
-  });
+  return apiRequest<{ items: Dish[]; nextCursor: string | null; hasMore: boolean }>(
+    "/dishes/search",
+    {
+      query: { q: params.q, limit: params.limit ?? 24 },
+      auth: true,
+      signal,
+    },
+  );
 }
 
 /** VERIFIED: GET /dishes/:id */
