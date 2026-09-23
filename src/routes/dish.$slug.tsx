@@ -43,7 +43,8 @@ function dishJsonLd(dish: Dish, path: string) {
     name,
     url: canonicalUrl(path),
   };
-  if (typeof dish.description === "string" && dish.description) data["description"] = dish.description;
+  if (typeof dish.description === "string" && dish.description)
+    data["description"] = dish.description;
   if (image) data["image"] = image;
   const category = dishCategory(dish)?.name;
   if (category) data["category"] = category;
