@@ -44,16 +44,20 @@ function CartPage() {
         // on network retry, double-click, or browser refresh. A fresh key is only
         // created when the user starts a genuinely new checkout.
         const key = checkoutIdempotencyKey.current ?? crypto.randomUUID();
-        checkoutIdempotencyKey.current = key;
-        return await createOrder(
-          {
-            vendorId: lines[0]?.vendorId,
-            fulfillmentMode: "PICKUP",
-            items: lines.map((l) => ({ offeringId: l.dishId, quantity: l.quantity })),
-          },
-          undefined,
-          key,
-        );
+          checkoutIdempotencyKey.current = key;
+          const firstLine = lines[0];
+          if (!firstLine) throw new Error("Cart is empty");
+          const vendorId = firstLine.vendorId;
+          if (!vendorId) throw new Error("Cannot create order — vendor information is missing from cart items");
+          return await createOrder(
+            {
+              vendorId,
+              fulfillmentMode: "PICKUP",
+              items: lines.map((l) => ({ offeringId: l.dishId, quantity: l.quantity })),
+            },
+            undefined,
+            key,
+          );
       } finally {
         inFlight.current = false;
       }
