@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { cancelOrder, createPaymentAttempt, getOrder, getPickupCode } from "@/lib/api/orders";
 import { ORDER_STATES } from "@/lib/api/types";
 import type { Order } from "@/lib/api/types";
@@ -62,6 +63,8 @@ function OrderDetailPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["order", orderId] }),
   });
 
+  const order = query.data;
+  const currentStatus = order?.status ?? order?.state ?? null;
   const pickupCodeQuery = useQuery({
     queryKey: ["order", orderId, "pickup-code", token],
     queryFn: ({ signal }) => getPickupCode(orderId, signal),
@@ -69,12 +72,12 @@ function OrderDetailPage() {
     retry: false,
   });
 
-  const pickupCode = pickupCodeQuery.data && typeof pickupCodeQuery.data === "object" && pickupCodeQuery.data !== null
-    ? (pickupCodeQuery.data as Record<string, unknown>).code ?? null
-    : null;
+  const rawPickupCode =
+    pickupCodeQuery.data && typeof pickupCodeQuery.data === "object"
+      ? (pickupCodeQuery.data as Record<string, unknown>)["code"]
+      : null;
+  const pickupCode = typeof rawPickupCode === "string" ? rawPickupCode : null;
 
-  const order = query.data;
-  const currentStatus = order?.status ?? order?.state ?? null;
   const currentIndex = currentStatus
     ? ORDER_STATES.indexOf(currentStatus as (typeof ORDER_STATES)[number])
     : -1;

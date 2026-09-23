@@ -73,14 +73,9 @@ function HomePage() {
   const feed = useQuery({
     queryKey: ["dishes", "feed", "hub", intent, budget],
     queryFn: ({ signal }) =>
-      getDishFeed(
-        {
-          limit: 48,
-          maxBudget: budget ?? undefined,
-          kind: intent === "thirsty" ? "DRINK" : undefined,
-        },
-        signal,
-      ),
+      // Only parameters the backend is known to accept are sent. Budget and
+      // intent narrowing happen on the client against the returned dishes.
+      getDishFeed({ limit: 48 }, signal),
     retry: false,
   });
 

@@ -21,7 +21,14 @@ export function getDishFeed(
   signal?: AbortSignal,
 ) {
   return apiRequest<{ items: Dish[]; nextCursor: string | null; hasMore: boolean }>("/dishes/feed", {
-    query: { ...params, limit: params.limit ?? 48 },
+    query: {
+      limit: params.limit ?? 48,
+      cursor: params.cursor,
+      // Arrays are sent as comma-separated values; the backend's own filter
+      // format is unconfirmed, so nothing else is added to the query.
+      cuisines: params.cuisines?.length ? params.cuisines.join(",") : undefined,
+      categories: params.categories?.length ? params.categories.join(",") : undefined,
+    },
     auth: true,
     signal,
   });
