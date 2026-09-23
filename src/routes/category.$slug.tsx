@@ -75,8 +75,8 @@ function CategoryPage() {
       />
       <header className="grid gap-3">
         <h1 className="text-4xl text-foreground">{name}</h1>
-        {typeof category.description === "string" && category.description ? (
-          <p className="max-w-2xl text-muted-foreground">{category.description}</p>
+        {typeof category["description"] === "string" && category["description"] ? (
+          <p className="max-w-2xl text-muted-foreground">{String(category["description"])}</p>
         ) : (
           <p className="max-w-2xl text-muted-foreground">
             Everything FoodyPop vendors publish in the {name} category.

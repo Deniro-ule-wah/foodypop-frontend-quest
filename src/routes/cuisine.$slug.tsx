@@ -73,8 +73,8 @@ function CuisinePage() {
       />
       <header className="grid gap-3">
         <h1 className="text-4xl text-foreground">{name}</h1>
-        {typeof cuisine.description === "string" && cuisine.description ? (
-          <p className="max-w-2xl text-muted-foreground">{cuisine.description}</p>
+        {typeof cuisine["description"] === "string" && cuisine["description"] ? (
+          <p className="max-w-2xl text-muted-foreground">{String(cuisine["description"])}</p>
         ) : (
           <p className="max-w-2xl text-muted-foreground">
             Dishes and drinks that FoodyPop vendors publish under {name}.
