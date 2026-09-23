@@ -43,9 +43,7 @@ function AuthPage() {
     <div className="mx-auto grid max-w-md gap-6">
       <div className="flex items-center justify-center gap-3 text-center">
         <BrandLogo size="sm" />
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-          FoodyPop
-        </p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">FoodyPop</p>
       </div>
       <header className="grid gap-2">
         <h1 className="text-3xl text-foreground">

@@ -127,8 +127,10 @@ function DishDetail() {
     select: (data: unknown) => {
       if (!data || typeof data !== "object") return new Set<string>();
       const body = data as Record<string, unknown>;
-      const items = (body.items as Array<Record<string, unknown>>) ?? [];
-      return new Set(items.filter((f) => f.targetType === "DISH").map((f) => f.targetId as string));
+      const items = (body["items"] as Array<Record<string, unknown>>) ?? [];
+      return new Set(
+        items.filter((f) => f["targetType"] === "DISH").map((f) => f["targetId"] as string),
+      );
     },
   });
 
@@ -158,9 +160,9 @@ function DishDetail() {
   // Compares against user.id (the database user ID from the auth response),
   // NOT against the raw JWT token string.
   const currentGesture: string | undefined = (() => {
-    if (!d.gestures || !user?.id) return undefined;
+    if (!d["gestures"] || !user?.id) return undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const arr = d.gestures as any[];
+    const arr = d["gestures"] as any[];
     if (!Array.isArray(arr)) return undefined;
     const match = arr.find(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -239,30 +241,26 @@ function DishDetail() {
               {(d.currency as string) || "KES"} {price.toLocaleString()}
             </p>
           ) : null}
-          {typeof d.tasteScore === "number" && d.tasteScore > 0 ? (
+          {typeof d["tasteScore"] === "number" && d["tasteScore"] > 0 ? (
             <div className="mt-2 flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Taste score:</span>
               <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-sm font-medium">
-                {d.tasteScore.toFixed(0)}
+                {Number(d["tasteScore"]).toFixed(0)}
                 <span className="text-muted-foreground">/100</span>
               </span>
             </div>
           ) : (
-            <p className="mt-2 text-sm text-muted-foreground">
-              Taste score — not enough data yet
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">Taste score — not enough data yet</p>
           )}
 
           <div className="flex flex-wrap gap-2">
             <button type="button" className="btn-primary" onClick={() => add(d)}>
               Add to cart
             </button>
-            {token ? followBtn : (
-              <button
-                type="button"
-                className="btn-secondary"
-                disabled
-              >
+            {token ? (
+              followBtn
+            ) : (
+              <button type="button" className="btn-secondary" disabled>
                 Follow dish
               </button>
             )}

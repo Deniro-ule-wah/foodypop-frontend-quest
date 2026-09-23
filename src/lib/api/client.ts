@@ -102,7 +102,15 @@ function buildUrl(path: string, query?: RequestOptions["query"]): string {
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { method = "GET", body, query, auth = false, signal, idempotencyKey, headers: extraHeaders } = options;
+  const {
+    method = "GET",
+    body,
+    query,
+    auth = false,
+    signal,
+    idempotencyKey,
+    headers: extraHeaders,
+  } = options;
   const headers: Record<string, string> = { accept: "application/json" };
   if (body !== undefined) headers["content-type"] = "application/json";
   if (idempotencyKey) headers["Idempotency-Key"] = idempotencyKey;

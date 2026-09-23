@@ -155,7 +155,7 @@ function CartPage() {
           unchanged.
         </p>
         <p className="mt-2">
-          Payment is initiated through{' '}
+          Payment is initiated through{" "}
           <span className="font-mono">POST /orders/:id/payment-attempts</span> on the order detail
           page after the order is created.
         </p>

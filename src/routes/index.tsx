@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { getDishFeed } from "@/lib/api/dishes";
 import { listCategories, listCuisines } from "@/lib/api/vendors";
 import { DishCard } from "@/components/dish-card";
-import { BrandLogo } from "@/components/brand-logo";
+import { IntentSelector } from "@/components/intent-selector";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/state";
 import { entitySlug } from "@/lib/slug";
 import { taxonomyId, taxonomyName } from "@/lib/taxonomy";
@@ -73,14 +73,9 @@ function HomePage() {
   const feed = useQuery({
     queryKey: ["dishes", "feed", "hub", intent, budget],
     queryFn: ({ signal }) =>
-      getDishFeed(
-        {
-          limit: 48,
-          maxBudget: budget ?? undefined,
-          kind: intent === "thirsty" ? "DRINK" : undefined,
-        },
-        signal,
-      ),
+      // Only parameters the backend is known to accept are sent. Budget and
+      // intent narrowing happen on the client against the returned dishes.
+      getDishFeed({ limit: 48 }, signal),
     retry: false,
   });
 
@@ -125,7 +120,9 @@ function HomePage() {
       ) : intent === "vendor" ? null : (
         <>
           <section className="rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-warm)] sm:p-12">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Dish first</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              Dish first
+            </p>
             <h1 className="mt-3 max-w-2xl text-4xl leading-tight text-foreground sm:text-5xl">
               Discover food and drinks worth trying.
             </h1>
@@ -137,7 +134,9 @@ function HomePage() {
             {/* Hungry intent: show budget + distance context */}
             {intent === "hungry" ? (
               <div className="mt-6 rounded-xl border border-border bg-muted/40 p-4">
-                <h2 className="text-sm font-semibold text-foreground">Hungry — find food near you</h2>
+                <h2 className="text-sm font-semibold text-foreground">
+                  Hungry — find food near you
+                </h2>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Filter by what fits your budget and how far you're willing to go.
                 </p>
@@ -203,65 +202,65 @@ function HomePage() {
             </form>
           </section>
 
-      <section className="grid gap-4">
-        <h2 className="text-2xl text-foreground">Browse FoodyPop</h2>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {HUBS.map((hub) => (
-            <li key={hub.to}>
-              <Link
-                to={hub.to}
-                className="block rounded-2xl border border-border bg-card p-4 transition-shadow hover:shadow-[var(--shadow-warm)]"
-              >
-                <h3 className="font-display text-lg text-foreground">{hub.label}</h3>
-                <p className="text-sm text-muted-foreground">{hub.blurb}</p>
+          <section className="grid gap-4">
+            <h2 className="text-2xl text-foreground">Browse FoodyPop</h2>
+            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {HUBS.map((hub) => (
+                <li key={hub.to}>
+                  <Link
+                    to={hub.to}
+                    className="block rounded-2xl border border-border bg-card p-4 transition-shadow hover:shadow-[var(--shadow-warm)]"
+                  >
+                    <h3 className="font-display text-lg text-foreground">{hub.label}</h3>
+                    <p className="text-sm text-muted-foreground">{hub.blurb}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="grid gap-4">
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 className="text-2xl text-foreground">Latest dishes</h2>
+              <Link to="/dishes" className="text-sm underline">
+                See all
               </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+            </div>
+            {feed.isPending ? (
+              <LoadingBlock label="Loading dishes" />
+            ) : feed.isError ? (
+              <ErrorBlock error={feed.error} onRetry={() => feed.refetch()} />
+            ) : feed.data.items.length === 0 ? (
+              <EmptyBlock
+                title="No dishes published yet"
+                hint="FoodyPop returned an empty feed. Nothing is substituted in its place."
+              />
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {feed.data.items.slice(0, 12).map((dish, i) => (
+                  <DishCard key={dish.id} dish={dish} priority={i < 3} />
+                ))}
+              </div>
+            )}
+          </section>
 
-      <section className="grid gap-4">
-        <div className="flex items-baseline justify-between gap-4">
-          <h2 className="text-2xl text-foreground">Latest dishes</h2>
-          <Link to="/dishes" className="text-sm underline">
-            See all
-          </Link>
-        </div>
-        {feed.isPending ? (
-          <LoadingBlock label="Loading dishes" />
-        ) : feed.isError ? (
-          <ErrorBlock error={feed.error} onRetry={() => feed.refetch()} />
-        ) : feed.data.items.length === 0 ? (
-          <EmptyBlock
-            title="No dishes published yet"
-            hint="FoodyPop returned an empty feed. Nothing is substituted in its place."
-          />
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {feed.data.items.slice(0, 12).map((dish, i) => (
-              <DishCard key={dish.id} dish={dish} priority={i < 3} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-2">
-        <TaxonomyPanel
-          title="Cuisines"
-          items={cuisines.data}
-          isPending={cuisines.isPending}
-          isError={cuisines.isError}
-          kind="cuisine"
-        />
-        <TaxonomyPanel
-          title="Categories"
-          items={categories.data}
-          isPending={categories.isPending}
-          isError={categories.isError}
-          kind="category"
-        />
-      </section>
-      </>
+          <section className="grid gap-4 md:grid-cols-2">
+            <TaxonomyPanel
+              title="Cuisines"
+              items={cuisines.data}
+              isPending={cuisines.isPending}
+              isError={cuisines.isError}
+              kind="cuisine"
+            />
+            <TaxonomyPanel
+              title="Categories"
+              items={categories.data}
+              isPending={categories.isPending}
+              isError={categories.isError}
+              kind="category"
+            />
+          </section>
+        </>
       )}
     </div>
   );
@@ -340,107 +339,3 @@ const DISTANCE_PRESETS = [
   { label: "Within 10 km", value: 10 },
   { label: "Within 20 km", value: 20 },
 ];
-
-const INTENT_OPTIONS = [
-  {
-    id: "discover",
-    title: "Discover",
-    blurb: "Explore dishes and drinks.",
-    description: "Browse by cuisine, category, and taste. Find something new.",
-  },
-  {
-    id: "hungry",
-    title: "Hungry",
-    blurb: "Find something to eat now.",
-    description: "Filter by what's nearby, affordable, and available.",
-  },
-  {
-    id: "thirsty",
-    title: "Thirsty",
-    blurb: "Find something to drink.",
-    description: "Soda, tea, coffee, juice, milkshake — whatever you're craving.",
-  },
-  {
-    id: "vendor",
-    title: "Vendor",
-    blurb: "Manage your dishes and orders.",
-    description: "For food vendors: list dishes, accept orders, manage pickup.",
-  },
-];
-
-function IntentSelector({
-  onChoose,
-  onSkip,
-}: {
-  onChoose: (id: string) => void;
-  onSkip: () => void;
-}) {
-  return (
-    <div className="grid gap-6">
-      <div className="flex items-center justify-center gap-3 text-center">
-        <BrandLogo size="sm" />
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-          FoodyPop
-        </p>
-      </div>
-      <h1 className="mt-2 text-center text-3xl font-display leading-tight text-foreground sm:text-4xl">
-        What are you looking for?
-      </h1>
-      <p className="mt-2 text-center max-w-lg text-muted-foreground">
-        Tell us what you want and we'll show you the right dishes.
-      </p>
-
-      <dl className="grid gap-4 sm:grid-cols-2">
-        {INTENT_OPTIONS.map((intent) => (
-          <div
-            key={intent.id}
-            className="grid gap-3 rounded-2xl border border-border bg-card p-5 transition hover:shadow-[var(--shadow-warm)]"
-          >
-            <dd className="grid gap-2">
-              <dt className="text-xl font-semibold text-foreground">{intent.title}</dt>
-              <p className="text-sm text-muted-foreground">{intent.blurb}</p>
-              <p className="text-sm text-muted-foreground leading-relaxed">{intent.description}</p>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  className="btn-primary"
-                  onClick={() => onChoose(intent.id)}
-                >
-                  {intent.title}
-                </button>
-                {intent.id === "vendor" ? (
-                  <Link to="/vendors" className="btn-ghost">
-                    Go to vendors
-                  </Link>
-                ) : (
-                  <button
-                    type="button"
-                    className="btn-ghost"
-                    onClick={onSkip}
-                  >
-                    Skip
-                  </button>
-                )}
-              </div>
-            </dd>
-          </div>
-        ))}
-      </dl>
-
-      <p className="text-center text-sm text-muted-foreground">
-        <button
-          type="button"
-          className="underline hover:text-foreground"
-          onClick={onSkip}
-        >
-          Skip — show me everything
-        </button>
-      </p>
-
-      <p className="text-center text-xs text-muted-foreground">
-        Your choice is remembered for this browser session.
-      </p>
-    </div>
-  );
-}
-

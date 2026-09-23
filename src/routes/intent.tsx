@@ -83,7 +83,7 @@ function IntentPage() {
   };
 
   // Once chosen, navigate to the right place.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   if (chosen && !loading) {
     if (chosen === "vendor") {
       navigate({ to: "/vendors" });
@@ -99,9 +99,7 @@ function IntentPage() {
   return (
     <div className="mx-auto grid max-w-2xl gap-10 px-4 py-12">
       <header className="grid gap-3 text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-          FoodyPop
-        </p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">FoodyPop</p>
         <h1 className="text-4xl font-display leading-tight text-foreground">
           What are you looking for?
         </h1>
@@ -150,11 +148,7 @@ function IntentPage() {
       </dl>
 
       <p className="text-center text-sm text-muted-foreground">
-        <button
-          type="button"
-          className="underline hover:text-foreground"
-          onClick={handleSkipAll}
-        >
+        <button type="button" className="underline hover:text-foreground" onClick={handleSkipAll}>
           Skip — show me everything
         </button>
       </p>

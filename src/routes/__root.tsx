@@ -121,9 +121,7 @@ function Footer() {
       <div className="mx-auto grid max-w-6xl gap-6 text-sm sm:grid-cols-3">
         <div className="flex items-center gap-2">
           <BrandLogo size="sm" />
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            FoodyPop
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">FoodyPop</p>
         </div>
         <nav aria-label="Discover">
           <h2 className="font-display text-base text-foreground">Discover</h2>

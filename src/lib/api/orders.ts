@@ -26,11 +26,7 @@ export function getOrder(id: string, signal?: AbortSignal) {
   return apiRequest<Order>(`/orders/${encodeURIComponent(id)}`, { auth: true, signal });
 }
 
-export function createOrder(
-  body: unknown,
-  signal?: AbortSignal,
-  idempotencyKey?: string,
-) {
+export function createOrder(body: unknown, signal?: AbortSignal, idempotencyKey?: string) {
   return apiRequest<Order>("/orders", {
     method: "POST",
     body,
@@ -63,16 +59,13 @@ export function createPaymentAttempt(
   paymentIdempotencyKey: string,
   signal?: AbortSignal,
 ) {
-  return apiRequest<unknown>(
-    `/orders/${encodeURIComponent(orderId)}/payment-attempts`,
-    {
-      method: "POST",
-      body: { phoneNumber },
-      auth: true,
-      signal,
-      headers: { "Payment-Idempotency-Key": paymentIdempotencyKey },
-    },
-  );
+  return apiRequest<unknown>(`/orders/${encodeURIComponent(orderId)}/payment-attempts`, {
+    method: "POST",
+    body: { phoneNumber },
+    auth: true,
+    signal,
+    headers: { "Payment-Idempotency-Key": paymentIdempotencyKey },
+  });
 }
 
 /**
@@ -92,8 +85,10 @@ export function getPickupCode(id: string, signal?: AbortSignal) {
  * Vendor-side pickup verification. The customer does not perform this action.
  */
 export function verifyPickup(id: string, body: unknown, signal?: AbortSignal) {
-  return apiRequest<unknown>(
-    `/orders/${encodeURIComponent(id)}/verify-pickup`,
-    { method: "POST", body, auth: true, signal },
-  );
+  return apiRequest<unknown>(`/orders/${encodeURIComponent(id)}/verify-pickup`, {
+    method: "POST",
+    body,
+    auth: true,
+    signal,
+  });
 }
