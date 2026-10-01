@@ -72,7 +72,7 @@ function DrinksHub() {
           isPending={feed.isPending}
           error={feed.isError ? feed.error : null}
           onRetry={() => feed.refetch()}
-          emptyTitle="No drinks published yet"
+          emptyTitle="No drinks in this demo catalog yet."
           emptyHint="No item in the FoodyPop feed is marked as a drink. Nothing is substituted in its place."
         />
       </section>
