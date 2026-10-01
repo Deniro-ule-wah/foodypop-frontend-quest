@@ -30,7 +30,7 @@ import img10 from "@/assets/demo/dish-10.jpg.asset.json";
 import type { Dish, Taxonomy, Vendor } from "@/lib/api/types";
 
 export const DATA_MODE = "DEMO" as const;
-export const DEMO_ENABLED = import.meta.env.VITE_DEMO_CATALOG !== "false";
+export const DEMO_ENABLED = import.meta.env["VITE_DEMO_CATALOG"] !== "false";
 
 export interface DemoVendor extends Vendor {
   dataMode: "DEMO";
@@ -163,7 +163,7 @@ const SEEDS: DishSeed[] = [
 
 const vendorById = new Map(VENDORS.map((v) => [v.id, v]));
 
-const DISHES: Dish[] = SEEDS.map((s) => {
+const DISHES: Dish[] = SEEDS.map((s): Dish => {
   const vendor = vendorById.get(`demo-ven-${s.vendor}`)!;
   const catId = `demo-cat-${s.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return {
@@ -177,7 +177,7 @@ const DISHES: Dish[] = SEEDS.map((s) => {
     kind: "FOOD",
     isDrink: false,
     category: { id: catId, name: s.category },
-    vendor: { id: vendor.id, name: vendor.name },
+    vendor: { id: vendor.id, name: vendor.name as string },
     vendorId: vendor.id,
     demoTags: s.tags,
     demoTaste: s.taste,
