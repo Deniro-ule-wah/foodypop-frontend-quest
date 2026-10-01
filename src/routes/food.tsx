@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { getDishFeed } from "@/lib/api/dishes";
+import { useState } from "react";
+import { getDishFeed, TASTES } from "@/lib/api/dishes";
+import { demoTaste } from "@/lib/demo/catalog";
 import { DishGrid } from "@/components/dish-grid";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { dishIsDrink } from "@/lib/taxonomy";
@@ -38,7 +40,10 @@ function FoodHub() {
     retry: false,
   });
 
-  const dishes = feed.data?.items.filter((d) => dishIsDrink(d) !== true);
+  const [taste, setTaste] = useState<string | null>(null);
+  const dishes = feed.data?.items.filter(
+    (d) => dishIsDrink(d) !== true && (!taste || demoTaste(d).includes(taste)),
+  );
 
   return (
     <div className="grid gap-8">
@@ -67,6 +72,20 @@ function FoodHub() {
 
       <section className="grid gap-4">
         <h2 className="text-2xl text-foreground">Dishes</h2>
+        <div role="group" aria-label="Filter by taste" className="flex flex-wrap gap-2">
+          {[null, ...TASTES].map((t) => (
+            <button
+              key={t ?? "all"}
+              type="button"
+              aria-pressed={taste === t}
+              onClick={() => setTaste(t)}
+              className={`rounded-full px-3 py-1.5 text-sm transition-colors ${taste === t ? "bg-primary text-primary-foreground" : "border border-border bg-card hover:bg-secondary/40"}`}
+            >
+              {t ?? "All tastes"}
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">Taste filters use demo catalog taste metadata, not measured customer data.</p>
         <DishGrid
           dishes={dishes}
           isPending={feed.isPending}

@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getVendor } from "@/lib/api/vendors";
 import { seo } from "@/lib/seo";
+import { DishGrid } from "@/components/dish-grid";
+import { demoDishesForVendor, isDemoId, type DemoVendor } from "@/lib/demo/catalog";
 import { ErrorBlock, GapNotice, LoadingBlock } from "@/components/state";
 
 export const Route = createFileRoute("/vendors/$vendorId")({
@@ -40,6 +42,17 @@ function VendorDetail() {
       ) : null}
       {v.description ? <p className="max-w-2xl text-foreground">{v.description}</p> : null}
 
+      {isDemoId(v.id) ? (
+        <>
+          <p className="text-sm text-muted-foreground">
+            {(v as DemoVendor).tagline} · {(v as DemoVendor).category} · {(v as DemoVendor).hours} ·{" "}
+            {(v as DemoVendor).fulfillment.join(" / ")}
+          </p>
+          <p className="text-xs text-muted-foreground">Demo vendor — fictional business for the demo catalog.</p>
+          <h2 className="text-2xl text-foreground">Dishes</h2>
+          <DishGrid dishes={demoDishesForVendor(v.id)} isPending={false} error={null} onRetry={() => {}} emptyTitle="No dishes" emptyHint="" />
+        </>
+      ) : null}
       <GapNotice title="Vendor dish listing unavailable">
         The backend exposes no per-vendor dish endpoint (
         <span className="font-mono">GET /vendors/:id/dishes</span> returns 404). Use search or the

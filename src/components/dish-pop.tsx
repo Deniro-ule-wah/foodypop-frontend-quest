@@ -9,6 +9,7 @@ import { DishMedia, DishIdentity, buildMediaList } from "@/components/dish-media
 import { EmptyBlock } from "@/components/state";
 import { useSession } from "@/lib/session";
 import type { Dish } from "@/lib/api/types";
+import { demoReviews, demoTags, demoTaste, isDemoDish } from "@/lib/demo/catalog";
 
 interface PopViewportProps {
   initialDish: Dish;
@@ -35,11 +36,17 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
   const { add } = useCart();
   const { token, user } = useSession();
   const queryClient = useQueryClient();
-  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    const i = feedItems.findIndex((d) => d.id === initialDish.id);
+    return i >= 0 ? i : initialIndex;
+  });
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
 
   // Use feedItems as the navigation list, falling back to [initialDish] when feed is empty
-  const navItems = feedItems.length > 0 ? feedItems : [initialDish];
+  const navItems =
+    feedItems.length > 0 && feedItems.some((d) => d.id === initialDish.id)
+      ? feedItems
+      : [initialDish, ...feedItems];
   const dish = navItems[currentIndex];
   const total = navItems.length;
 
@@ -90,6 +97,8 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
   const category = dish ? dishCategory(dish) : null;
   const vendorName = dish ? (dish.vendor?.name || dish.vendor?.displayName || null) : null;
   const vendorId = dish ? (dish.vendor?.id || dish.vendorId || null) : null;
+  const demo = isDemoDish(dish);
+  const fulfillment = dish ? ((dish["demoFulfillment"] as string[] | undefined) ?? []) : [];
 
   // Current user's active gesture — derived from backend d.gestures filtered by user.id
   const currentGesture = dish && user?.id ? (() => {
@@ -179,8 +188,26 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
           </p>
         ) : null}
 
+        {demo ? (
+          <div className="grid gap-3 rounded-2xl border border-border bg-card p-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Taste profile · demo catalog metadata
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {demoTaste(dish).map((t) => (
+                <span key={t} className="rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">{t}</span>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {demoTags(dish).map((t) => (
+                <span key={t} className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">#{t}</span>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         {/* Taste score */}
-        {typeof tasteScore === "number" && tasteScore > 0 ? (
+        {demo ? null : typeof tasteScore === "number" && tasteScore > 0 ? (
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Taste score:</span>
             <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-sm font-medium">
@@ -193,7 +220,7 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
         )}
 
         {/* Taste gestures */}
-        <div className="grid gap-2">
+        <div className={demo ? "hidden" : "grid gap-2"}>
           <p className="text-sm text-muted-foreground">
             Show what this dish tastes like to you.
           </p>
@@ -227,8 +254,19 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
           ) : null}
         </div>
 
+        {demo ? (
+          <div className="grid gap-2">
+            <button type="button" className="btn-primary w-fit" disabled>
+              {(dish["demoCta"] as string) || "Order"}
+            </button>
+            <p className="text-xs text-muted-foreground">
+              Demo dish — ordering, following and taste reactions open once this dish is published by a real vendor.
+            </p>
+          </div>
+        ) : null}
+
         {/* Primary actions */}
-        <div className="flex flex-wrap gap-2">
+        <div className={demo ? "hidden" : "flex flex-wrap gap-2"}>
           <button
             type="button"
             className="rounded-full bg-[#F5A623] px-4 py-2 text-sm font-medium text-white hover:bg-[#E0961F]"
@@ -266,7 +304,7 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
             </button>
           )}
         </div>
-        {!token ? (
+        {!token && !demo ? (
           <p className="text-xs text-muted-foreground">
             <Link to="/auth" className="underline">Sign in</Link> to follow dishes.
           </p>
@@ -284,6 +322,21 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
                 </Link>
               ) : null}
             </p>
+          </div>
+        ) : null}
+
+        {fulfillment.length ? (
+          <p className="text-sm text-muted-foreground">Available for: {fulfillment.join(" · ")}</p>
+        ) : null}
+
+        {demo && demoReviews(dish).length ? (
+          <div className="grid gap-2 rounded-2xl border border-dashed border-border p-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Sample reviews · Demo content</p>
+            {demoReviews(dish).map((r) => (
+              <blockquote key={r.text} className="text-sm text-foreground">
+                “{r.text}” <span className="text-muted-foreground">— {r.stars}★ sample</span>
+              </blockquote>
+            ))}
           </div>
         ) : null}
 

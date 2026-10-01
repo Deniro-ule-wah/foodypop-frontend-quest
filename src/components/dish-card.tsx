@@ -3,6 +3,7 @@ import { dishDisplayName, dishEffectivePrice } from "@/lib/cart";
 import { dishImage } from "@/lib/taxonomy";
 import { entitySlug } from "@/lib/slug";
 import type { Dish } from "@/lib/api/types";
+import { demoTaste, isDemoDish } from "@/lib/demo/catalog";
 
 function priceLabel(dish: Dish): string | null {
   const value = dishEffectivePrice(dish);
@@ -24,7 +25,12 @@ export function DishCard({ dish, priority = false }: { dish: Dish; priority?: bo
       params={{ slug: entitySlug(dish.id, name) }}
       className="group overflow-hidden rounded-2xl border border-border bg-card transition-shadow hover:shadow-[var(--shadow-warm)]"
     >
-      <div className="aspect-[4/3] w-full overflow-hidden bg-muted">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
+        {isDemoDish(dish) ? (
+          <span className="absolute left-2 top-2 z-10 rounded-full bg-background/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+            Demo
+          </span>
+        ) : null}
         {image ? (
           <img
             src={image}
@@ -49,6 +55,9 @@ export function DishCard({ dish, priority = false }: { dish: Dish; priority?: bo
               <span className="ml-2 text-xs font-normal text-muted-foreground">discounted</span>
             ) : null}
           </p>
+        ) : null}
+        {demoTaste(dish).length ? (
+          <p className="text-xs text-foreground/80">{demoTaste(dish).join(" · ")}</p>
         ) : null}
         {vendorName ? <p className="text-xs text-muted-foreground">{vendorName}</p> : null}
       </div>
