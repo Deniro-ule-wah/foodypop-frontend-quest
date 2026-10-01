@@ -36,11 +36,17 @@ export function DishPopViewport({ initialDish, initialIndex, feedItems, onDishUp
   const { add } = useCart();
   const { token, user } = useSession();
   const queryClient = useQueryClient();
-  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    const i = feedItems.findIndex((d) => d.id === initialDish.id);
+    return i >= 0 ? i : initialIndex;
+  });
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
 
   // Use feedItems as the navigation list, falling back to [initialDish] when feed is empty
-  const navItems = feedItems.length > 0 ? feedItems : [initialDish];
+  const navItems =
+    feedItems.length > 0 && feedItems.some((d) => d.id === initialDish.id)
+      ? feedItems
+      : [initialDish, ...feedItems];
   const dish = navItems[currentIndex];
   const total = navItems.length;
 
