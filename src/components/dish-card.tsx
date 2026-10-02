@@ -4,6 +4,7 @@ import { dishImage } from "@/lib/taxonomy";
 import { entitySlug } from "@/lib/slug";
 import type { Dish } from "@/lib/api/types";
 import { demoTaste, isDemoDish } from "@/lib/demo/catalog";
+import { useOpenDishPop } from "@/components/dish-pop-dialog";
 
 function priceLabel(dish: Dish): string | null {
   const value = dishEffectivePrice(dish);
@@ -18,11 +19,17 @@ export function DishCard({ dish, priority = false }: { dish: Dish; priority?: bo
   const vendorName = dish.vendor?.name || dish.vendor?.displayName || null;
   const price = priceLabel(dish);
   const hasDiscount = dish.discountPrice != null && dish.price != null;
+  const openPop = useOpenDishPop();
 
   return (
     <Link
       to="/dish/$slug"
       params={{ slug: entitySlug(dish.id, name) }}
+      onClick={(e) => {
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        e.preventDefault();
+        openPop(dish);
+      }}
       className="group overflow-hidden rounded-2xl border border-border bg-card transition-shadow hover:shadow-[var(--shadow-warm)]"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">

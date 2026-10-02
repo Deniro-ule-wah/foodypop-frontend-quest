@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SessionProvider } from "../lib/session";
 import { CartProvider } from "../lib/cart";
 import { SiteHeader } from "../components/site-header";
+import { DishPopDialog } from "../components/dish-pop-dialog";
 import { API_BASE_URL } from "../lib/api/client";
 
 function NotFoundComponent() {
@@ -215,6 +216,7 @@ function RootComponent() {
             </main>
             <Footer />
           </div>
+          <DishPopDialog />
         </CartProvider>
       </SessionProvider>
     </QueryClientProvider>
