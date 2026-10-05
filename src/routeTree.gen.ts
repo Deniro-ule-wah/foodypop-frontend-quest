@@ -17,6 +17,7 @@ import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CuisinesRouteImport } from './routes/cuisines'
 import { Route as DiagnosticsRouteImport } from './routes/diagnostics'
+import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DrinksRouteImport } from './routes/drinks'
 import { Route as FoodRouteImport } from './routes/food'
 import { Route as IntentRouteImport } from './routes/intent'
@@ -72,6 +73,11 @@ const CuisinesRoute = CuisinesRouteImport.update({
 const DiagnosticsRoute = DiagnosticsRouteImport.update({
   id: '/diagnostics',
   path: '/diagnostics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscoverRoute = DiscoverRouteImport.update({
+  id: '/discover',
+  path: '/discover',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DrinksRoute = DrinksRouteImport.update({
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/cuisines': typeof CuisinesRoute
   '/diagnostics': typeof DiagnosticsRoute
+  '/discover': typeof DiscoverRoute
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
   '/intent': typeof IntentRoute
@@ -190,6 +197,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/cuisines': typeof CuisinesRoute
   '/diagnostics': typeof DiagnosticsRoute
+  '/discover': typeof DiscoverRoute
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
   '/intent': typeof IntentRoute
@@ -217,6 +225,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/cuisines': typeof CuisinesRoute
   '/diagnostics': typeof DiagnosticsRoute
+  '/discover': typeof DiscoverRoute
   '/drinks': typeof DrinksRoute
   '/food': typeof FoodRoute
   '/intent': typeof IntentRoute
@@ -245,6 +254,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cuisines'
     | '/diagnostics'
+    | '/discover'
     | '/drinks'
     | '/food'
     | '/intent'
@@ -271,6 +281,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cuisines'
     | '/diagnostics'
+    | '/discover'
     | '/drinks'
     | '/food'
     | '/intent'
@@ -297,6 +308,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cuisines'
     | '/diagnostics'
+    | '/discover'
     | '/drinks'
     | '/food'
     | '/intent'
@@ -324,6 +336,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CuisinesRoute: typeof CuisinesRoute
   DiagnosticsRoute: typeof DiagnosticsRoute
+  DiscoverRoute: typeof DiscoverRoute
   DrinksRoute: typeof DrinksRoute
   FoodRoute: typeof FoodRoute
   IntentRoute: typeof IntentRoute
@@ -398,6 +411,13 @@ declare module '@tanstack/react-router' {
       path: '/diagnostics'
       fullPath: '/diagnostics'
       preLoaderRoute: typeof DiagnosticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discover': {
+      id: '/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/drinks': {
@@ -524,6 +544,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CuisinesRoute: CuisinesRoute,
   DiagnosticsRoute: DiagnosticsRoute,
+  DiscoverRoute: DiscoverRoute,
   DrinksRoute: DrinksRoute,
   FoodRoute: FoodRoute,
   IntentRoute: IntentRoute,
