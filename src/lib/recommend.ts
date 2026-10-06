@@ -24,6 +24,11 @@ export const emptySignals = (): Signals => ({ tastes: {}, categories: {}, seen: 
 
 const catName = (d: Dish) => dishCategory(d)?.name ?? "";
 
+/** Dishes the backend explicitly marks unavailable are never served. */
+export function filterAvailable(dishes: Dish[]): Dish[] {
+  return dishes.filter((d) => d["isAvailable"] !== false);
+}
+
 export function filterByType(dishes: Dish[], type: DishType, intent: Intent): Dish[] {
   const want: DishType = intent === "thirsty" ? "drink" : intent === "hungry" ? "food" : type;
   if (want === "all") return dishes;
@@ -78,7 +83,21 @@ export function serveNextDish(
   all: Dish[],
   opts: { intent: Intent; type: DishType; signals: Signals; currentId?: string | undefined; rng?: () => number },
 ): Dish | null {
-  const pool = filterByType(all, opts.type, opts.intent);
+  const pool = filterByType(filterAvailable(all), opts.type, opts.intent);
   const scored = applyNovelty(scoreCandidates(pool, opts.intent, opts.signals), opts.signals, opts.currentId);
   return weightedRandomSelect(scored, opts.rng)?.dish ?? null;
+}
+
+/** Session-only taste signal. Never touches the backend. */
+export function recordTaste(s: Signals, taste: string, on: boolean): void {
+  s.tastes[taste] = (s.tastes[taste] ?? 0) + (on ? 1 : -1);
+}
+
+/** Only real (non-demo) dishes with a signed-in user may send a taste reaction to FoodyPop. */
+export function shouldSendTaste(isDemo: boolean, hasToken: boolean, on: boolean): boolean {
+  return on && !isDemo && hasToken;
+}
+
+export function markSeen(s: Signals, id: string): void {
+  s.seen = [...s.seen.filter((x) => x !== id), id];
 }
