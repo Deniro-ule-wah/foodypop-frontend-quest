@@ -9,7 +9,8 @@ import { useSession } from "@/lib/session";
 import { DishMedia, DishIdentity } from "@/components/dish-media";
 import { ErrorBlock, LoadingBlock } from "@/components/state";
 import { demoReviews, demoTags, demoTaste, demoVendor, isDemoDish } from "@/lib/demo/catalog";
-import { emptySignals, serveNextDish, type DishType, type Intent, type Signals } from "@/lib/recommend";
+import { classifySwipe } from "@/lib/swipe";
+import { emptySignals, markSeen, recordTaste, serveNextDish, shouldSendTaste, type DishType, type Intent, type Signals } from "@/lib/recommend";
 import type { Dish } from "@/lib/api/types";
 
 type Panel = "dish" | "details" | "vendor" | "taste";
@@ -60,7 +61,7 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
       }
       const next = serveNextDish(all, { intent: i, type: t, signals: s, currentId: current?.id });
       if (next) {
-        s.seen = [...s.seen.filter((id) => id !== next.id), next.id];
+        markSeen(s, next.id);
         session.currentId = next.id;
       }
       shownAt.current = Date.now();
@@ -122,22 +123,25 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
   });
 
   // Swipe on the dish surface: up = next, left = details, right = vendor.
-  const touch = useRef<{ x: number; y: number } | null>(null);
+  const touch = useRef<{ x: number; y: number; t: number } | null>(null);
+  const lastSwipe = useRef(0);
   const onTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0];
-    touch.current = t ? { x: t.clientX, y: t.clientY } : null;
+    // Multi-finger (pinch) gestures are never treated as swipes.
+    touch.current = t && e.touches.length === 1 ? { x: t.clientX, y: t.clientY, t: Date.now() } : null;
   };
   const onTouchEnd = (e: React.TouchEvent) => {
     const s = touch.current;
     const t = e.changedTouches[0];
     touch.current = null;
     if (!s || !t) return;
-    const dx = t.clientX - s.x;
-    const dy = t.clientY - s.y;
-    if (Math.max(Math.abs(dx), Math.abs(dy)) < 50) return;
-    if (Math.abs(dy) > Math.abs(dx)) {
-      if (dy < 0) serve({ skip: true });
-    } else openPanel(dx < 0 ? "details" : "vendor");
+    const now = Date.now();
+    if (now - lastSwipe.current < 350) return; // one action per gesture
+    const action = classifySwipe(t.clientX - s.x, t.clientY - s.y, now - s.t);
+    if (!action) return;
+    lastSwipe.current = now;
+    if (action === "next") serve({ skip: true });
+    else openPanel(action);
   };
 
   const demo = isDemoDish(current);
@@ -153,8 +157,8 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
     const picked = session.picked[current.id] ?? [];
     const on = !picked.includes(t);
     session.picked[current.id] = on ? [...picked, t] : picked.filter((x) => x !== t);
-    session.signals.tastes[t] = (session.signals.tastes[t] ?? 0) + (on ? 1 : -1);
-    if (on && !demo && token) gesture.mutate(t);
+    recordTaste(session.signals, t, on);
+    if (shouldSendTaste(demo, !!token, on)) gesture.mutate(t);
     force((n) => n + 1);
   };
 
@@ -226,7 +230,7 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
       {header}
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr] lg:items-start">
         <div className="grid gap-3">
-          <div className="relative touch-pan-y select-none" style={{ touchAction: "pan-y" }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+          <div className="relative touch-none select-none" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onTouchCancel={() => (touch.current = null)}>
             <div key={current.id} className="animate-in fade-in-0 slide-in-from-bottom-4 duration-300 motion-reduce:animate-none">
               <DishMedia dish={current} />
             </div>
