@@ -8,3 +8,4 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- Next-dish selection for Dish POP lives only in src/lib/recommend.ts (rule-based, in-browser) so it can be swapped for a backend recommendation endpoint later without touching the UI.

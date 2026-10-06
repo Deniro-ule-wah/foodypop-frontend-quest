@@ -68,6 +68,9 @@ function FoodHub() {
             Categories
           </Link>
         </p>
+        <Link to="/discover" className="btn-primary w-fit">
+          Try Dish POP — one dish at a time
+        </Link>
       </header>
 
       <section className="grid gap-4">

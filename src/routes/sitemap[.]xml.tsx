@@ -18,6 +18,7 @@ import { canonicalUrl } from "@/lib/seo";
 const STATIC_PATHS = [
   "/",
   "/food",
+  "/discover",
   "/drinks",
   "/dishes",
   "/cuisines",

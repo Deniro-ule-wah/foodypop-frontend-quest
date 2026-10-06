@@ -55,7 +55,7 @@ export function scoreCandidates(dishes: Dish[], intent: Intent, s: Signals): Arr
 }
 
 /** Unseen dishes first; once everything is seen, start a fresh round. */
-export function applyNovelty<T extends { dish: Dish }>(scored: T[], s: Signals, currentId?: string): T[] {
+export function applyNovelty<T extends { dish: Dish }>(scored: T[], s: Signals, currentId?: string | undefined): T[] {
   const notCurrent = scored.filter((c) => c.dish.id !== currentId);
   const fresh = notCurrent.filter((c) => !s.seen.includes(c.dish.id));
   return fresh.length ? fresh : notCurrent.length ? notCurrent : scored;
@@ -76,7 +76,7 @@ export function weightedRandomSelect<T extends { score: number }>(items: T[], rn
 
 export function serveNextDish(
   all: Dish[],
-  opts: { intent: Intent; type: DishType; signals: Signals; currentId?: string; rng?: () => number },
+  opts: { intent: Intent; type: DishType; signals: Signals; currentId?: string | undefined; rng?: () => number },
 ): Dish | null {
   const pool = filterByType(all, opts.type, opts.intent);
   const scored = applyNovelty(scoreCandidates(pool, opts.intent, opts.signals), opts.signals, opts.currentId);
