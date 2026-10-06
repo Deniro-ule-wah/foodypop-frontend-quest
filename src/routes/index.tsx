@@ -107,6 +107,9 @@ function HomePage() {
               /* ignore */
             }
             setIntent(id);
+            if (id === "discover" || id === "hungry" || id === "thirsty") {
+              void navigate({ to: "/discover", search: { intent: id } });
+            }
           }}
           onSkip={() => {
             try {

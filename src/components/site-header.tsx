@@ -5,6 +5,7 @@ import { useCart } from "@/lib/cart";
 import { useSession } from "@/lib/session";
 
 const NAV = [
+  { to: "/discover", label: "Dish POP" },
   { to: "/dishes", label: "Dishes" },
   { to: "/food", label: "Food" },
   { to: "/drinks", label: "Drinks" },
