@@ -18,7 +18,18 @@ export function buildMediaList(dish: Dish): string[] {
   push(dish.imageUrl);
   push(dish.mediaUrl);
   dish.images?.forEach(push);
-  return list;
+  const videos = (Array.isArray(dish["videos"]) ? (dish["videos"] as unknown[]) : []).filter(
+    (v): v is string => typeof v === "string",
+  );
+  videos.forEach(push);
+  // Product media capacity: up to 5 photos and up to 2 videos.
+  const photos = list.filter((u) => !isVideoUrl(u)).slice(0, 5);
+  const clips = list.filter(isVideoUrl).slice(0, 2);
+  return [...photos, ...clips];
+}
+
+export function isVideoUrl(url: string): boolean {
+  return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url);
 }
 
 /** DishPop media — large primary image, gallery controls only when there are
@@ -28,10 +39,13 @@ export function DishMedia({
   dish,
   activeIndex = 0,
   setActiveIndex,
+  swipeGallery = true,
 }: {
   dish: Dish;
   activeIndex?: number;
   setActiveIndex?: (index: number) => void;
+  /** Off inside Dish POP, where left/right swipes mean Details/Vendor. */
+  swipeGallery?: boolean;
 }) {
   const mediaList = buildMediaList(dish);
   const total = mediaList.length;
@@ -51,7 +65,9 @@ export function DishMedia({
   return (
     <div
       className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-border bg-muted"
-      onTouchStart={(e) => (touchX.current = e.touches[0]?.clientX ?? null)}
+      onTouchStart={(e) => {
+        if (swipeGallery) touchX.current = e.touches[0]?.clientX ?? null;
+      }}
       onTouchEnd={(e) => {
         const start = touchX.current;
         const end = e.changedTouches[0]?.clientX;
@@ -60,7 +76,21 @@ export function DishMedia({
         go(end < start ? 1 : -1);
       }}
     >
-      {currentSrc && status !== "failed" ? (
+      {currentSrc && status !== "failed" && isVideoUrl(currentSrc) ? (
+        <video
+          key={currentSrc}
+          src={currentSrc}
+          controls
+          playsInline
+          muted
+          preload="metadata"
+          aria-label={`${name} — video`}
+          onLoadedData={() => setStatus("loaded")}
+          onError={() => setStatus("failed")}
+          className="h-full w-full object-cover"
+        />
+      ) : null}
+      {currentSrc && status !== "failed" && !isVideoUrl(currentSrc) ? (
         <img
           key={currentSrc}
           src={currentSrc}
@@ -82,7 +112,7 @@ export function DishMedia({
       ) : null}
       {!currentSrc || status === "failed" ? (
         <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-muted-foreground">
-          {currentSrc ? "This photo couldn't be loaded" : "No image published for this dish"}
+          {currentSrc ? "This media couldn't be loaded" : "No image published for this dish"}
         </div>
       ) : null}
 

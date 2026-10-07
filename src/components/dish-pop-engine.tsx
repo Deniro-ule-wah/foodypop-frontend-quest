@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getDishFeed, createGesture, TASTES } from "@/lib/api/dishes";
 import { dishDisplayName, dishEffectivePrice, useCart } from "@/lib/cart";
-import { dishCategory } from "@/lib/taxonomy";
 import { entitySlug } from "@/lib/slug";
 import { useSession } from "@/lib/session";
 import { DishMedia, DishIdentity } from "@/components/dish-media";
@@ -11,10 +10,10 @@ import { ErrorBlock, LoadingBlock } from "@/components/state";
 import { demoReviews, demoTags, demoTaste, demoVendor, isDemoDish } from "@/lib/demo/catalog";
 import { classifySwipe } from "@/lib/swipe";
 import {
+  browserRecommender as rec,
+  classifyLeave,
   emptySignals,
   markSeen,
-  recordTaste,
-  serveNextDish,
   shouldSendTaste,
   type DishType,
   type Intent,
@@ -61,6 +60,8 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
   const [panel, setPanel] = useState<Panel>("dish");
   const [, force] = useState(0);
   const shownAt = useRef(Date.now());
+  const interacted = useRef(false);
+  const [mediaIdx, setMediaIdx] = useState(0);
   const { token } = useSession();
   const { add } = useCart();
 
@@ -69,17 +70,19 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
       const i = opts?.intent ?? intent;
       const t = opts?.type ?? type;
       const s = session.signals;
-      // Skip signal: leaving a dish within 2s nudges its category down.
-      if (opts?.skip && current && Date.now() - shownAt.current < 2000) {
-        const c = dishCategory(current)?.name ?? "";
-        s.categories[c] = (s.categories[c] ?? 0) - 0.5;
+      // Leave signal: quick skip vs. moving on after interacting.
+      if (opts?.skip && current) {
+        const kind = classifyLeave(Date.now() - shownAt.current, interacted.current);
+        if (kind) rec.signal(s, current, kind);
       }
-      const next = serveNextDish(all, { intent: i, type: t, signals: s, currentId: current?.id });
+      const next = rec.next(all, { intent: i, type: t, signals: s, currentId: current?.id });
       if (next) {
         markSeen(s, next.id);
         session.currentId = next.id;
       }
       shownAt.current = Date.now();
+      interacted.current = false;
+      setMediaIdx(0);
       setCurrent(next);
       setPanel("dish");
     },
@@ -108,9 +111,9 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
 
   const openPanel = (p: Panel) => {
     setPanel((cur) => (cur === p ? "dish" : p));
-    if (current && (p === "details" || p === "vendor")) {
-      const c = dishCategory(current)?.name ?? "";
-      session.signals.categories[c] = (session.signals.categories[c] ?? 0) + 0.3;
+    if (current && (p === "details" || p === "vendor") && panel !== p) {
+      interacted.current = true;
+      rec.signal(session.signals, current, p);
     }
   };
 
@@ -174,7 +177,11 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
     const picked = session.picked[current.id] ?? [];
     const on = !picked.includes(t);
     session.picked[current.id] = on ? [...picked, t] : picked.filter((x) => x !== t);
-    recordTaste(session.signals, t, on);
+    rec.taste(session.signals, t, on);
+    if (on) {
+      interacted.current = true;
+      rec.signal(session.signals, current, "taste");
+    }
     if (shouldSendTaste(demo, !!token, on)) gesture.mutate(t);
     force((n) => n + 1);
   };
@@ -299,7 +306,12 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
               key={current.id}
               className="animate-in fade-in-0 slide-in-from-bottom-4 duration-300 motion-reduce:animate-none"
             >
-              <DishMedia dish={current} />
+              <DishMedia
+                dish={current}
+                activeIndex={mediaIdx}
+                setActiveIndex={setMediaIdx}
+                swipeGallery={false}
+              />
             </div>
             {demo ? (
               <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -317,6 +329,11 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
               {original !== null && price !== null && price < original ? (
                 <span className="ml-2 text-sm font-normal text-muted-foreground line-through">
                   KES {original.toLocaleString()}
+                </span>
+              ) : null}
+              {original !== null && price !== null && price < original ? (
+                <span className="ml-2 rounded-full bg-primary px-2 py-0.5 align-middle text-xs font-semibold text-primary-foreground">
+                  −{Math.round((1 - price / original) * 100)}%
                 </span>
               ) : null}
               {demo && price !== null ? (
