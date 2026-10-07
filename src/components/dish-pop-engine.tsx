@@ -250,9 +250,11 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
               type="button"
               className="btn-primary"
               onClick={() => {
-                setTypeState("all");
                 session.type = "all";
-                setIntent("discover");
+                session.intent = "discover";
+                setTypeState("all");
+                setIntentState("discover");
+                serve({ intent: "discover", type: "all" });
               }}
             >
               Discover any dish
