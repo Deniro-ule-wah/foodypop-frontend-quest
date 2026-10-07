@@ -37,7 +37,11 @@ interface CartLine {
   quantity: number;
 }
 
-function buildOrderBody(lines: CartLine[]): { vendorId: string; fulfillmentMode: "PICKUP"; items: { offeringId: string; quantity: number }[] } {
+function buildOrderBody(lines: CartLine[]): {
+  vendorId: string;
+  fulfillmentMode: "PICKUP";
+  items: { offeringId: string; quantity: number }[];
+} {
   const vendorId = lines[0]?.vendorId;
   if (!vendorId) throw new Error("Missing vendorId");
   return {
@@ -50,7 +54,14 @@ function buildOrderBody(lines: CartLine[]): { vendorId: string; fulfillmentMode:
 describe("order body construction — INT-AUD-007", () => {
   it("includes vendorId from the first cart line", () => {
     const lines: CartLine[] = [
-      { dishId: "d1", name: "Dish A", unitPrice: 500, currency: "KES", vendorId: "v1", quantity: 1 },
+      {
+        dishId: "d1",
+        name: "Dish A",
+        unitPrice: 500,
+        currency: "KES",
+        vendorId: "v1",
+        quantity: 1,
+      },
     ];
     const body = buildOrderBody(lines);
     expect(body.vendorId).toBe("v1");
@@ -58,8 +69,22 @@ describe("order body construction — INT-AUD-007", () => {
 
   it("maps cart lines to items with offeringId (not dishId)", () => {
     const lines: CartLine[] = [
-      { dishId: "d1", name: "Dish A", unitPrice: 500, currency: "KES", vendorId: "v1", quantity: 2 },
-      { dishId: "d2", name: "Dish B", unitPrice: 300, currency: "KES", vendorId: "v1", quantity: 1 },
+      {
+        dishId: "d1",
+        name: "Dish A",
+        unitPrice: 500,
+        currency: "KES",
+        vendorId: "v1",
+        quantity: 2,
+      },
+      {
+        dishId: "d2",
+        name: "Dish B",
+        unitPrice: 300,
+        currency: "KES",
+        vendorId: "v1",
+        quantity: 1,
+      },
     ];
     const body = buildOrderBody(lines);
     expect(body.items).toEqual([
@@ -70,14 +95,28 @@ describe("order body construction — INT-AUD-007", () => {
 
   it("throws when vendorId is missing (catches incomplete cart)", () => {
     const lines: CartLine[] = [
-      { dishId: "d1", name: "Dish A", unitPrice: 500, currency: "KES", vendorId: null, quantity: 1 },
+      {
+        dishId: "d1",
+        name: "Dish A",
+        unitPrice: 500,
+        currency: "KES",
+        vendorId: null,
+        quantity: 1,
+      },
     ];
     expect(() => buildOrderBody(lines)).toThrow(/Missing vendorId/);
   });
 
   it("includes fulfillmentMode PICKUP", () => {
     const lines: CartLine[] = [
-      { dishId: "d1", name: "Dish A", unitPrice: 500, currency: "KES", vendorId: "v1", quantity: 1 },
+      {
+        dishId: "d1",
+        name: "Dish A",
+        unitPrice: 500,
+        currency: "KES",
+        vendorId: "v1",
+        quantity: 1,
+      },
     ];
     const body = buildOrderBody(lines);
     expect(body.fulfillmentMode).toBe("PICKUP");

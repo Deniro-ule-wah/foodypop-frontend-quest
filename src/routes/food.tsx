@@ -88,7 +88,9 @@ function FoodHub() {
             </button>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground">Taste filters use demo catalog taste metadata, not measured customer data.</p>
+        <p className="text-xs text-muted-foreground">
+          Taste filters use demo catalog taste metadata, not measured customer data.
+        </p>
         <DishGrid
           dishes={dishes}
           isPending={feed.isPending}

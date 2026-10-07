@@ -11,14 +11,19 @@ describe("frontend candidate selection", () => {
     for (let i = 0; i < all.length; i++) {
       const d = serveNextDish(all, { intent: "hungry", type: "all", signals: s, currentId: cur })!;
       expect(seen.has(d.id)).toBe(false);
-      seen.add(d.id); s.seen.push(d.id); cur = d.id;
+      seen.add(d.id);
+      s.seen.push(d.id);
+      cur = d.id;
     }
   });
   it("thirsty with no drinks returns null", () => {
-    expect(serveNextDish(all, { intent: "thirsty", type: "all", signals: emptySignals() })).toBeNull();
+    expect(
+      serveNextDish(all, { intent: "thirsty", type: "all", signals: emptySignals() }),
+    ).toBeNull();
   });
   it("taste picks steer selection", () => {
-    const s = emptySignals(); s.tastes["Sweet"] = 5;
+    const s = emptySignals();
+    s.tastes["Sweet"] = 5;
     let sweet = 0;
     for (let i = 0; i < 200; i++) {
       const d = serveNextDish(all, { intent: "discover", type: "all", signals: s })!;
@@ -27,7 +32,12 @@ describe("frontend candidate selection", () => {
     expect(sweet).toBeGreaterThan(100);
   });
   it("is not a fixed sequence", () => {
-    const ids = new Set(Array.from({ length: 30 }, () => serveNextDish(all, { intent: "discover", type: "all", signals: emptySignals() })!.id));
+    const ids = new Set(
+      Array.from(
+        { length: 30 },
+        () => serveNextDish(all, { intent: "discover", type: "all", signals: emptySignals() })!.id,
+      ),
+    );
     expect(ids.size).toBeGreaterThan(1);
   });
 });
@@ -38,6 +48,8 @@ import type { Dish } from "@/lib/api/types";
 
 const drink = { id: "d1", name: "Juice", isDrink: true, kind: "DRINK" } as Dish;
 const food = { id: "f1", name: "Rice", isDrink: false, kind: "FOOD" } as Dish;
+
+const all = demoDishes();
 
 describe("intents and type", () => {
   it("Discover food / drink / both", () => {
@@ -51,7 +63,10 @@ describe("intents and type", () => {
   });
   it("never serves a dish the backend marks unavailable", () => {
     const off = { ...food, id: "f2", isAvailable: false } as Dish;
-    for (let i = 0; i < 20; i++) expect(serveNextDish([off, food], { intent: "hungry", type: "all", signals: emptySignals() })?.id).toBe("f1");
+    for (let i = 0; i < 20; i++)
+      expect(
+        serveNextDish([off, food], { intent: "hungry", type: "all", signals: emptySignals() })?.id,
+      ).toBe("f1");
   });
   it("pool resets after every dish was seen", () => {
     const s = emptySignals();
@@ -59,10 +74,16 @@ describe("intents and type", () => {
     expect(serveNextDish(all, { intent: "discover", type: "all", signals: s })).not.toBeNull();
   });
   it("randomness stays inside the stronger half of candidates", () => {
-    const s = emptySignals(); s.tastes["Sweet"] = 10;
+    const s = emptySignals();
+    s.tastes["Sweet"] = 10;
     const sweetOnly = new Set(all.filter((d) => demoTaste(d).includes("Sweet")).map((d) => d.id));
     for (let i = 0; i < 50; i++) {
-      const id = serveNextDish(all, { intent: "discover", type: "all", signals: s, rng: () => Math.random() * 0.2 })!.id;
+      const id = serveNextDish(all, {
+        intent: "discover",
+        type: "all",
+        signals: s,
+        rng: () => Math.random() * 0.2,
+      })!.id;
       expect(sweetOnly.has(id)).toBe(true);
     }
   });
@@ -74,7 +95,9 @@ describe("taste safety", () => {
     expect(shouldSendTaste(false, false, true)).toBe(false);
     expect(shouldSendTaste(false, true, false)).toBe(false);
     expect(shouldSendTaste(false, true, true)).toBe(true);
-    const s = emptySignals(); recordTaste(s, "Spicy", true); recordTaste(s, "Spicy", false);
+    const s = emptySignals();
+    recordTaste(s, "Spicy", true);
+    recordTaste(s, "Spicy", false);
     expect(s.tastes["Spicy"]).toBe(0);
   });
 });

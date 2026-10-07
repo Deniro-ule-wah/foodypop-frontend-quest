@@ -32,11 +32,20 @@ export function filterAvailable(dishes: Dish[]): Dish[] {
 export function filterByType(dishes: Dish[], type: DishType, intent: Intent): Dish[] {
   const want: DishType = intent === "thirsty" ? "drink" : intent === "hungry" ? "food" : type;
   if (want === "all") return dishes;
-  return dishes.filter((d) => (want === "drink" ? dishIsDrink(d) === true : dishIsDrink(d) !== true));
+  return dishes.filter((d) =>
+    want === "drink" ? dishIsDrink(d) === true : dishIsDrink(d) !== true,
+  );
 }
 
-export function scoreCandidates(dishes: Dish[], intent: Intent, s: Signals): Array<{ dish: Dish; score: number }> {
-  const prices = dishes.map(dishEffectivePrice).filter((p): p is number => p !== null).sort((a, b) => a - b);
+export function scoreCandidates(
+  dishes: Dish[],
+  intent: Intent,
+  s: Signals,
+): Array<{ dish: Dish; score: number }> {
+  const prices = dishes
+    .map(dishEffectivePrice)
+    .filter((p): p is number => p !== null)
+    .sort((a, b) => a - b);
   const median = prices.length ? prices[Math.floor(prices.length / 2)]! : null;
   const recentCats = s.seen.slice(-2);
   return dishes.map((dish) => {
@@ -60,16 +69,25 @@ export function scoreCandidates(dishes: Dish[], intent: Intent, s: Signals): Arr
 }
 
 /** Unseen dishes first; once everything is seen, start a fresh round. */
-export function applyNovelty<T extends { dish: Dish }>(scored: T[], s: Signals, currentId?: string | undefined): T[] {
+export function applyNovelty<T extends { dish: Dish }>(
+  scored: T[],
+  s: Signals,
+  currentId?: string | undefined,
+): T[] {
   const notCurrent = scored.filter((c) => c.dish.id !== currentId);
   const fresh = notCurrent.filter((c) => !s.seen.includes(c.dish.id));
   return fresh.length ? fresh : notCurrent.length ? notCurrent : scored;
 }
 
-export function weightedRandomSelect<T extends { score: number }>(items: T[], rng: () => number = Math.random): T | null {
+export function weightedRandomSelect<T extends { score: number }>(
+  items: T[],
+  rng: () => number = Math.random,
+): T | null {
   if (!items.length) return null;
   // Controlled randomness: pick among the top half of candidates only.
-  const ranked = [...items].sort((a, b) => b.score - a.score).slice(0, Math.max(1, Math.ceil(items.length / 2)));
+  const ranked = [...items]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, Math.max(1, Math.ceil(items.length / 2)));
   const total = ranked.reduce((n, c) => n + c.score, 0);
   let r = rng() * total;
   for (const c of ranked) {
@@ -81,10 +99,20 @@ export function weightedRandomSelect<T extends { score: number }>(items: T[], rn
 
 export function serveNextDish(
   all: Dish[],
-  opts: { intent: Intent; type: DishType; signals: Signals; currentId?: string | undefined; rng?: () => number },
+  opts: {
+    intent: Intent;
+    type: DishType;
+    signals: Signals;
+    currentId?: string | undefined;
+    rng?: () => number;
+  },
 ): Dish | null {
   const pool = filterByType(filterAvailable(all), opts.type, opts.intent);
-  const scored = applyNovelty(scoreCandidates(pool, opts.intent, opts.signals), opts.signals, opts.currentId);
+  const scored = applyNovelty(
+    scoreCandidates(pool, opts.intent, opts.signals),
+    opts.signals,
+    opts.currentId,
+  );
   return weightedRandomSelect(scored, opts.rng)?.dish ?? null;
 }
 

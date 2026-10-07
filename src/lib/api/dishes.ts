@@ -35,9 +35,8 @@ export function getDishFeed(
   signal?: AbortSignal,
 ) {
   const demo = params.cursor ? [] : demoDishes();
-  return withDemo(apiRequest<Page>(
-    "/dishes/feed",
-    {
+  return withDemo(
+    apiRequest<Page>("/dishes/feed", {
       query: {
         limit: params.limit ?? 48,
         cursor: params.cursor,
@@ -48,8 +47,9 @@ export function getDishFeed(
       },
       auth: true,
       signal,
-    },
-  ), demo);
+    }),
+    demo,
+  );
 }
 
 /** VERIFIED: GET /dishes/search */
@@ -57,14 +57,14 @@ export function searchDishes(
   params: { q?: string; cursor?: string; limit?: number },
   signal?: AbortSignal,
 ) {
-  return withDemo(apiRequest<Page>(
-    "/dishes/search",
-    {
+  return withDemo(
+    apiRequest<Page>("/dishes/search", {
       query: { q: params.q, limit: params.limit ?? 24 },
       auth: true,
       signal,
-    },
-  ), searchDemo(params.q ?? ""));
+    }),
+    searchDemo(params.q ?? ""),
+  );
 }
 
 /** VERIFIED: GET /dishes/:id — demo ids resolve locally, never hit the backend. */

@@ -75,7 +75,10 @@ export function DishMedia({
         />
       ) : null}
       {currentSrc && status === "loading" ? (
-        <div className="absolute inset-0 animate-pulse bg-muted motion-reduce:animate-none" aria-hidden="true" />
+        <div
+          className="absolute inset-0 animate-pulse bg-muted motion-reduce:animate-none"
+          aria-hidden="true"
+        />
       ) : null}
       {!currentSrc || status === "failed" ? (
         <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-muted-foreground">

@@ -28,7 +28,10 @@ export function useOpenDishPop() {
       to: ".",
       search: ((prev: Record<string, unknown>) => ({ ...prev, pop: dish.id })) as never,
       resetScroll: false,
-      mask: { to: "/dish/$slug", params: { slug: entitySlug(dish.id, dishDisplayName(dish)) } } as never,
+      mask: {
+        to: "/dish/$slug",
+        params: { slug: entitySlug(dish.id, dishDisplayName(dish)) },
+      } as never,
     });
   };
 }
@@ -43,7 +46,8 @@ export function DishPopDialog() {
     },
   });
   const returnFocus = useRef<Element | null>(null);
-  if (popId && typeof document !== "undefined" && !returnFocus.current) returnFocus.current = document.activeElement;
+  if (popId && typeof document !== "undefined" && !returnFocus.current)
+    returnFocus.current = document.activeElement;
 
   const known = popId ? clicked.get(popId) : undefined;
   const query = useQuery({
@@ -110,7 +114,11 @@ export function DishPopDialog() {
             ) : (
               <>
                 <DialogPrimitive.Title className="sr-only">Dish</DialogPrimitive.Title>
-                {query.error ? <ErrorBlock error={query.error} onRetry={() => void query.refetch()} /> : <LoadingBlock label="Loading dish" />}
+                {query.error ? (
+                  <ErrorBlock error={query.error} onRetry={() => void query.refetch()} />
+                ) : (
+                  <LoadingBlock label="Loading dish" />
+                )}
               </>
             )}
           </div>

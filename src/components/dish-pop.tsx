@@ -62,8 +62,11 @@ export function DishPopViewport({
     enabled: !!token && !demo,
     select: (data: unknown) => {
       if (!data || typeof data !== "object") return new Set<string>();
-      const items = ((data as Record<string, unknown>)["items"] as Array<Record<string, unknown>>) ?? [];
-      return new Set(items.filter((f) => f["targetType"] === "DISH").map((f) => f["targetId"] as string));
+      const items =
+        ((data as Record<string, unknown>)["items"] as Array<Record<string, unknown>>) ?? [];
+      return new Set(
+        items.filter((f) => f["targetType"] === "DISH").map((f) => f["targetId"] as string),
+      );
     },
   });
   const isFollowing = dish ? (followQuery.data?.has(dish.id) ?? false) : false;
@@ -104,22 +107,38 @@ export function DishPopViewport({
   const reviews = demo ? demoReviews(dish) : [];
   const currentGesture =
     user?.id && Array.isArray(dish["gestures"])
-      ? (dish["gestures"] as Array<{ userId?: string; type?: string }>).find((g) => g.userId === user.id)?.type
+      ? (dish["gestures"] as Array<{ userId?: string; type?: string }>).find(
+          (g) => g.userId === user.id,
+        )?.type
       : undefined;
 
   return (
     <article className="grid gap-6 lg:grid-cols-[1.15fr_1fr] lg:gap-8">
       <div className="grid content-start gap-4">
-        <DishMedia dish={dish} activeIndex={activeMediaIndex} setActiveIndex={setActiveMediaIndex} />
+        <DishMedia
+          dish={dish}
+          activeIndex={activeMediaIndex}
+          setActiveIndex={setActiveMediaIndex}
+        />
         {showDishNav && total > 1 ? (
           <div className="flex items-center gap-3">
-            <button type="button" className="rounded-full border border-border px-3 py-1.5 text-sm hover:bg-secondary/40"
-              onClick={() => setCurrentIndex((i) => (i > 0 ? i - 1 : total - 1))} aria-label="Previous dish">
+            <button
+              type="button"
+              className="rounded-full border border-border px-3 py-1.5 text-sm hover:bg-secondary/40"
+              onClick={() => setCurrentIndex((i) => (i > 0 ? i - 1 : total - 1))}
+              aria-label="Previous dish"
+            >
               ← Previous
             </button>
-            <span className="text-sm text-muted-foreground">{currentIndex + 1} / {total}</span>
-            <button type="button" className="rounded-full border border-border px-3 py-1.5 text-sm hover:bg-secondary/40"
-              onClick={() => setCurrentIndex((i) => (i < total - 1 ? i + 1 : 0))} aria-label="Next dish">
+            <span className="text-sm text-muted-foreground">
+              {currentIndex + 1} / {total}
+            </span>
+            <button
+              type="button"
+              className="rounded-full border border-border px-3 py-1.5 text-sm hover:bg-secondary/40"
+              onClick={() => setCurrentIndex((i) => (i < total - 1 ? i + 1 : 0))}
+              aria-label="Next dish"
+            >
               Next →
             </button>
           </div>
@@ -129,8 +148,16 @@ export function DishPopViewport({
       <div className="grid min-w-0 content-start gap-4">
         {/* Identity + price */}
         <div className="grid gap-2">
-          {demo ? <span className={`${label} w-fit rounded-full border border-border px-2 py-0.5`}>Demo catalog</span> : null}
-          {renderTitle ? renderTitle(name) : <h1 className="font-display text-3xl leading-tight text-foreground">{name}</h1>}
+          {demo ? (
+            <span className={`${label} w-fit rounded-full border border-border px-2 py-0.5`}>
+              Demo catalog
+            </span>
+          ) : null}
+          {renderTitle ? (
+            renderTitle(name)
+          ) : (
+            <h1 className="font-display text-3xl leading-tight text-foreground">{name}</h1>
+          )}
           <DishIdentity dish={dish} />
           {price !== null ? (
             <p className="text-2xl font-semibold text-primary">
@@ -140,7 +167,11 @@ export function DishPopViewport({
                   {currency} {original!.toLocaleString()}
                 </span>
               ) : null}
-              {demo ? <span className="ml-2 text-xs font-normal text-muted-foreground">illustrative price</span> : null}
+              {demo ? (
+                <span className="ml-2 text-xs font-normal text-muted-foreground">
+                  illustrative price
+                </span>
+              ) : null}
             </p>
           ) : (
             <p className="text-sm text-muted-foreground">Price not published yet</p>
@@ -153,10 +184,14 @@ export function DishPopViewport({
             <p className={label}>Taste profile · proposed by the demo catalog, not user stats</p>
             <div className="flex flex-wrap gap-2">
               {demoTaste(dish).map((t) => (
-                <span key={t} className={`${chip} bg-primary/10 text-primary`}>{t}</span>
+                <span key={t} className={`${chip} bg-primary/10 text-primary`}>
+                  {t}
+                </span>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground">Taste reactions are off for demo dishes.</p>
+            <p className="text-xs text-muted-foreground">
+              Taste reactions are off for demo dishes.
+            </p>
           </div>
         ) : (
           <div className={section}>
@@ -171,19 +206,30 @@ export function DishPopViewport({
               {TASTES.map((t) => {
                 const active = currentGesture === t;
                 return (
-                  <button key={t} type="button" aria-pressed={active}
+                  <button
+                    key={t}
+                    type="button"
+                    aria-pressed={active}
                     className={`${chip} transition-colors ${active ? "bg-primary font-medium text-primary-foreground" : "border border-border bg-card hover:bg-secondary/40"}`}
                     disabled={!token || gesture.isPending}
-                    onClick={() => gesture.mutate(t)}>
+                    onClick={() => gesture.mutate(t)}
+                  >
                     {active ? `✓ ${t}` : t}
                   </button>
                 );
               })}
             </div>
             {!token ? (
-              <p className="text-xs text-muted-foreground"><Link to="/auth" className="underline">Sign in</Link> to react to dishes.</p>
+              <p className="text-xs text-muted-foreground">
+                <Link to="/auth" className="underline">
+                  Sign in
+                </Link>{" "}
+                to react to dishes.
+              </p>
             ) : null}
-            {gesture.isError ? <p className="text-xs text-destructive">Could not record your reaction. Try again.</p> : null}
+            {gesture.isError ? (
+              <p className="text-xs text-destructive">Could not record your reaction. Try again.</p>
+            ) : null}
           </div>
         )}
 
@@ -191,12 +237,21 @@ export function DishPopViewport({
         {dish.description || ingredients.length || demoTags(dish).length ? (
           <div className={section}>
             <p className={label}>About this dish</p>
-            {dish.description ? <p className="text-sm text-foreground">{String(dish.description)}</p> : null}
-            {ingredients.length ? <p className="text-sm text-muted-foreground">Ingredients: {ingredients.join(", ")}</p> : null}
+            {dish.description ? (
+              <p className="text-sm text-foreground">{String(dish.description)}</p>
+            ) : null}
+            {ingredients.length ? (
+              <p className="text-sm text-muted-foreground">Ingredients: {ingredients.join(", ")}</p>
+            ) : null}
             {demoTags(dish).length ? (
               <div className="flex flex-wrap gap-2">
                 {demoTags(dish).map((t) => (
-                  <span key={t} className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">#{t}</span>
+                  <span
+                    key={t}
+                    className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground"
+                  >
+                    #{t}
+                  </span>
                 ))}
               </div>
             ) : null}
@@ -226,12 +281,17 @@ export function DishPopViewport({
               <>
                 <p className="text-sm italic text-muted-foreground">{vendorInfo.tagline}</p>
                 <p className="text-sm text-muted-foreground">
-                  {vendorInfo.location as string} · {vendorInfo.fulfillment.join(" · ")} (sample details, not verified)
+                  {vendorInfo.location as string} · {vendorInfo.fulfillment.join(" · ")} (sample
+                  details, not verified)
                 </p>
               </>
             ) : null}
             {vendorId ? (
-              <Link to="/vendors/$vendorId" params={{ vendorId }} className="w-fit text-sm underline hover:text-primary">
+              <Link
+                to="/vendors/$vendorId"
+                params={{ vendorId }}
+                className="w-fit text-sm underline hover:text-primary"
+              >
                 View vendor
               </Link>
             ) : null}
@@ -247,23 +307,43 @@ export function DishPopViewport({
           <div className="grid gap-2">
             <div className="flex flex-wrap gap-2">
               {price !== null ? (
-                <button type="button" className="rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
-                  onClick={() => add(dish)}>
+                <button
+                  type="button"
+                  className="rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+                  onClick={() => add(dish)}
+                >
                   Add to cart
                 </button>
               ) : null}
               {token ? (
-                <button type="button" className="rounded-full border border-border px-5 py-2.5 text-sm hover:bg-secondary/40"
+                <button
+                  type="button"
+                  className="rounded-full border border-border px-5 py-2.5 text-sm hover:bg-secondary/40"
                   disabled={follow.isPending || unfollow.isPending}
                   onClick={() =>
-                    (isFollowing ? unfollow : follow).mutate({ targetType: "DISH", targetId: dish.id })
-                  }>
-                  {follow.isPending ? "Following…" : unfollow.isPending ? "Unfollowing…" : isFollowing ? "Unfollow dish" : "Follow dish"}
+                    (isFollowing ? unfollow : follow).mutate({
+                      targetType: "DISH",
+                      targetId: dish.id,
+                    })
+                  }
+                >
+                  {follow.isPending
+                    ? "Following…"
+                    : unfollow.isPending
+                      ? "Unfollowing…"
+                      : isFollowing
+                        ? "Unfollow dish"
+                        : "Follow dish"}
                 </button>
               ) : null}
             </div>
             {!token ? (
-              <p className="text-xs text-muted-foreground"><Link to="/auth" className="underline">Sign in</Link> to follow dishes.</p>
+              <p className="text-xs text-muted-foreground">
+                <Link to="/auth" className="underline">
+                  Sign in
+                </Link>{" "}
+                to follow dishes.
+              </p>
             ) : null}
           </div>
         )}

@@ -27,13 +27,16 @@ function DiscoverPage() {
         <h1 className="text-3xl text-foreground sm:text-4xl">What are you looking for?</h1>
         <p className="text-sm text-muted-foreground">
           One dish at a time. Prefer a list?{" "}
-          <Link to="/food" className="underline">Browse all food</Link>
+          <Link to="/food" className="underline">
+            Browse all food
+          </Link>
         </p>
       </header>
       <DishPopEngine {...(intent ? { initialIntent: intent } : {})} />
       <p className="text-xs text-muted-foreground">
-        Next dishes are picked in your browser from simple rules (your intent, taste picks, price and variety) plus some
-        surprise. This is a stand-in until FoodyPop's own recommendations are available.
+        Next dishes are picked in your browser from simple rules (your intent, taste picks, price
+        and variety) plus some surprise. This is a stand-in until FoodyPop's own recommendations are
+        available.
       </p>
     </div>
   );
