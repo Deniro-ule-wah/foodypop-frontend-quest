@@ -10,13 +10,28 @@ import { DishMedia, DishIdentity } from "@/components/dish-media";
 import { ErrorBlock, LoadingBlock } from "@/components/state";
 import { demoReviews, demoTags, demoTaste, demoVendor, isDemoDish } from "@/lib/demo/catalog";
 import { classifySwipe } from "@/lib/swipe";
-import { emptySignals, markSeen, recordTaste, serveNextDish, shouldSendTaste, type DishType, type Intent, type Signals } from "@/lib/recommend";
+import {
+  emptySignals,
+  markSeen,
+  recordTaste,
+  serveNextDish,
+  shouldSendTaste,
+  type DishType,
+  type Intent,
+  type Signals,
+} from "@/lib/recommend";
 import type { Dish } from "@/lib/api/types";
 
 type Panel = "dish" | "details" | "vendor" | "taste";
 
 /** Session-only discovery state (in memory; survives in-app navigation, not reloads). */
-const session: { signals: Signals; currentId: string | null; intent: Intent; type: DishType; picked: Record<string, string[]> } = {
+const session: {
+  signals: Signals;
+  currentId: string | null;
+  intent: Intent;
+  type: DishType;
+  picked: Record<string, string[]>;
+} = {
   signals: emptySignals(),
   currentId: null,
   intent: "discover",
@@ -103,7 +118,8 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement | null;
-      if (el && (el.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName))) return;
+      if (el && (el.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName)))
+        return;
       if (document.querySelector("[role=dialog]")) return;
       const map: Record<string, () => void> = {
         ArrowDown: () => serve({ skip: true }),
@@ -128,7 +144,8 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
   const onTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0];
     // Multi-finger (pinch) gestures are never treated as swipes.
-    touch.current = t && e.touches.length === 1 ? { x: t.clientX, y: t.clientY, t: Date.now() } : null;
+    touch.current =
+      t && e.touches.length === 1 ? { x: t.clientX, y: t.clientY, t: Date.now() } : null;
   };
   const onTouchEnd = (e: React.TouchEvent) => {
     const s = touch.current;
@@ -166,18 +183,32 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
     <div className="grid gap-3">
       <div role="group" aria-label="What are you looking for?" className="flex flex-wrap gap-2">
         {INTENTS.map((i) => (
-          <button key={i.id} type="button" aria-pressed={intent === i.id} onClick={() => setIntent(i.id)}
-            className={`rounded-full px-4 py-2 text-sm transition-colors ${intent === i.id ? "bg-primary text-primary-foreground" : "border border-border bg-card hover:bg-secondary/40"}`}>
+          <button
+            key={i.id}
+            type="button"
+            aria-pressed={intent === i.id}
+            onClick={() => setIntent(i.id)}
+            className={`rounded-full px-4 py-2 text-sm transition-colors ${intent === i.id ? "bg-primary text-primary-foreground" : "border border-border bg-card hover:bg-secondary/40"}`}
+          >
             <span className="font-medium">{i.label}</span>
             <span className="ml-1.5 hidden text-xs opacity-80 sm:inline">· {i.hint}</span>
           </button>
         ))}
       </div>
       {intent === "discover" ? (
-        <div role="group" aria-label="Food or drink" className="flex gap-1 rounded-full border border-border p-1 w-fit text-xs font-medium">
+        <div
+          role="group"
+          aria-label="Food or drink"
+          className="flex gap-1 rounded-full border border-border p-1 w-fit text-xs font-medium"
+        >
           {(["all", "food", "drink"] as DishType[]).map((t) => (
-            <button key={t} type="button" aria-pressed={type === t} onClick={() => setType(t)}
-              className={`rounded-full px-3 py-1 uppercase tracking-wide ${type === t ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
+            <button
+              key={t}
+              type="button"
+              aria-pressed={type === t}
+              onClick={() => setType(t)}
+              className={`rounded-full px-3 py-1 uppercase tracking-wide ${type === t ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}
+            >
               {t === "all" ? "Both" : t}
             </button>
           ))}
@@ -186,8 +217,20 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
     </div>
   );
 
-  if (feed.isPending) return <div className="grid gap-4">{header}<LoadingBlock label="Finding a dish for you" /></div>;
-  if (feed.isError) return <div className="grid gap-4">{header}<ErrorBlock error={feed.error} onRetry={() => void feed.refetch()} /></div>;
+  if (feed.isPending)
+    return (
+      <div className="grid gap-4">
+        {header}
+        <LoadingBlock label="Finding a dish for you" />
+      </div>
+    );
+  if (feed.isError)
+    return (
+      <div className="grid gap-4">
+        {header}
+        <ErrorBlock error={feed.error} onRetry={() => void feed.refetch()} />
+      </div>
+    );
 
   if (!current) {
     return (
@@ -195,11 +238,23 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
         {header}
         <div className={box}>
           <p className="font-medium text-foreground">
-            {intent === "thirsty" || type === "drink" ? "No drinks are published yet." : "No dishes match right now."}
+            {intent === "thirsty" || type === "drink"
+              ? "No drinks are published yet."
+              : "No dishes match right now."}
           </p>
-          <p className="text-sm text-muted-foreground">Nothing is invented in their place. Try another option:</p>
+          <p className="text-sm text-muted-foreground">
+            Nothing is invented in their place. Try another option:
+          </p>
           <div className="flex flex-wrap gap-2">
-            <button type="button" className="btn-primary" onClick={() => { setTypeState("all"); session.type = "all"; setIntent("discover"); }}>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => {
+                setTypeState("all");
+                session.type = "all";
+                setIntent("discover");
+              }}
+            >
               Discover any dish
             </button>
           </div>
@@ -216,7 +271,9 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
   const vInfo = vendorId ? demoVendor(vendorId) : null;
   const picked = session.picked[current.id] ?? [];
   const reviews = demo ? demoReviews(current) : [];
-  const learned = Object.entries(session.signals.tastes).filter(([, w]) => w > 0).map(([t]) => t);
+  const learned = Object.entries(session.signals.tastes)
+    .filter(([, w]) => w > 0)
+    .map(([t]) => t);
 
   const controls: Array<{ p: Panel | "next"; label: string; key: string }> = [
     { p: "details", label: "Details", key: "←" },
@@ -230,8 +287,16 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
       {header}
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr] lg:items-start">
         <div className="grid gap-3">
-          <div className="relative touch-none select-none" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onTouchCancel={() => (touch.current = null)}>
-            <div key={current.id} className="animate-in fade-in-0 slide-in-from-bottom-4 duration-300 motion-reduce:animate-none">
+          <div
+            className="relative touch-none select-none"
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+            onTouchCancel={() => (touch.current = null)}
+          >
+            <div
+              key={current.id}
+              className="animate-in fade-in-0 slide-in-from-bottom-4 duration-300 motion-reduce:animate-none"
+            >
               <DishMedia dish={current} />
             </div>
             {demo ? (
@@ -244,14 +309,23 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
             <h2 className="font-display text-3xl leading-tight text-foreground">{name}</h2>
             <DishIdentity dish={current} />
             <p className="text-xl font-semibold text-primary">
-              {price !== null ? `${(current.currency as string) || "KES"} ${price.toLocaleString()}` : "Price not published yet"}
+              {price !== null
+                ? `${(current.currency as string) || "KES"} ${price.toLocaleString()}`
+                : "Price not published yet"}
               {original !== null && price !== null && price < original ? (
-                <span className="ml-2 text-sm font-normal text-muted-foreground line-through">KES {original.toLocaleString()}</span>
+                <span className="ml-2 text-sm font-normal text-muted-foreground line-through">
+                  KES {original.toLocaleString()}
+                </span>
               ) : null}
-              {demo && price !== null ? <span className="ml-2 text-xs font-normal text-muted-foreground">illustrative</span> : null}
+              {demo && price !== null ? (
+                <span className="ml-2 text-xs font-normal text-muted-foreground">illustrative</span>
+              ) : null}
             </p>
             {demoTaste(current).length ? (
-              <p className="text-sm text-foreground/80">{demoTaste(current).join(" · ")} <span className="text-xs text-muted-foreground">(demo labels)</span></p>
+              <p className="text-sm text-foreground/80">
+                {demoTaste(current).join(" · ")}{" "}
+                <span className="text-xs text-muted-foreground">(demo labels)</span>
+              </p>
             ) : null}
           </div>
         </div>
@@ -261,55 +335,119 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
             {controls.map((c) => {
               const active = c.p === panel;
               return (
-                <button key={c.p} type="button" aria-pressed={c.p === "next" ? undefined : active}
-                  aria-keyshortcuts={{ "←": "ArrowLeft", "↑": "ArrowUp", "→": "ArrowRight", "↓": "ArrowDown" }[c.key]}
+                <button
+                  key={c.p}
+                  type="button"
+                  aria-pressed={c.p === "next" ? undefined : active}
+                  aria-keyshortcuts={
+                    { "←": "ArrowLeft", "↑": "ArrowUp", "→": "ArrowRight", "↓": "ArrowDown" }[c.key]
+                  }
                   onClick={() => (c.p === "next" ? serve({ skip: true }) : openPanel(c.p))}
                   className={`grid min-h-14 place-items-center rounded-2xl px-1 py-2 text-sm font-medium transition-colors ${
-                    c.p === "next" ? "bg-primary text-primary-foreground hover:opacity-90" : active ? "bg-foreground text-background" : "border border-border bg-card hover:bg-secondary/40"
-                  }`}>
-                  <span aria-hidden="true" className="text-base leading-none">{c.key}</span>
+                    c.p === "next"
+                      ? "bg-primary text-primary-foreground hover:opacity-90"
+                      : active
+                        ? "bg-foreground text-background"
+                        : "border border-border bg-card hover:bg-secondary/40"
+                  }`}
+                >
+                  <span aria-hidden="true" className="text-base leading-none">
+                    {c.key}
+                  </span>
                   <span className="text-xs sm:text-sm">{c.label}</span>
                 </button>
               );
             })}
           </div>
-          <p className="hidden text-xs text-muted-foreground sm:block">Tip: use the arrow keys. On a phone, swipe the photo up for the next dish, left for details, right for the vendor.</p>
+          <p className="hidden text-xs text-muted-foreground sm:block">
+            Tip: use the arrow keys. On a phone, swipe the photo up for the next dish, left for
+            details, right for the vendor.
+          </p>
 
           {panel === "dish" ? (
             <div className={box}>
               <p className="text-sm text-foreground">{String(current.description ?? "")}</p>
-              {learned.length ? <p className="text-xs text-muted-foreground">Picking dishes with: {learned.join(", ")} (from your taste picks this session)</p> : null}
+              {learned.length ? (
+                <p className="text-xs text-muted-foreground">
+                  Picking dishes with: {learned.join(", ")} (from your taste picks this session)
+                </p>
+              ) : null}
             </div>
           ) : null}
 
           {panel === "details" ? (
             <div className={box}>
               <p className={label}>About this dish</p>
-              {current.description ? <p className="text-sm text-foreground">{String(current.description)}</p> : null}
-              {Array.isArray(current["ingredients"]) ? <p className="text-sm text-muted-foreground">Ingredients: {(current["ingredients"] as string[]).join(", ")}</p> : null}
-              {demoTags(current).length ? (
-                <div className="flex flex-wrap gap-1.5">{demoTags(current).map((t) => <span key={t} className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">#{t}</span>)}</div>
+              {current.description ? (
+                <p className="text-sm text-foreground">{String(current.description)}</p>
               ) : null}
-              <p className={`${label} mt-2`}>{demo ? "Sample reviews · Demo content" : "Reviews"}</p>
-              {reviews.length ? reviews.map((r) => (
-                <blockquote key={r.text} className="text-sm text-foreground">“{r.text}” <span className="text-muted-foreground">— {r.stars}★ sample</span></blockquote>
-              )) : <p className="text-sm text-muted-foreground">No reviews yet.</p>}
-              <Link to="/dish/$slug" params={{ slug: entitySlug(current.id, name) }} className="w-fit text-sm underline">Open full dish page</Link>
+              {Array.isArray(current["ingredients"]) ? (
+                <p className="text-sm text-muted-foreground">
+                  Ingredients: {(current["ingredients"] as string[]).join(", ")}
+                </p>
+              ) : null}
+              {demoTags(current).length ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {demoTags(current).map((t) => (
+                    <span
+                      key={t}
+                      className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground"
+                    >
+                      #{t}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+              <p className={`${label} mt-2`}>
+                {demo ? "Sample reviews · Demo content" : "Reviews"}
+              </p>
+              {reviews.length ? (
+                reviews.map((r) => (
+                  <blockquote key={r.text} className="text-sm text-foreground">
+                    “{r.text}” <span className="text-muted-foreground">— {r.stars}★ sample</span>
+                  </blockquote>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No reviews yet.</p>
+              )}
+              <Link
+                to="/dish/$slug"
+                params={{ slug: entitySlug(current.id, name) }}
+                className="w-fit text-sm underline"
+              >
+                Open full dish page
+              </Link>
             </div>
           ) : null}
 
           {panel === "vendor" ? (
             <div className={box}>
               <p className={label}>Made by{vInfo ? " · demo vendor" : ""}</p>
-              {vendorName ? <p className="font-medium text-foreground">{vendorName}</p> : <p className="text-sm text-muted-foreground">Vendor not published.</p>}
+              {vendorName ? (
+                <p className="font-medium text-foreground">{vendorName}</p>
+              ) : (
+                <p className="text-sm text-muted-foreground">Vendor not published.</p>
+              )}
               {vInfo ? (
                 <>
                   <p className="text-sm italic text-muted-foreground">{vInfo.tagline}</p>
-                  <p className="text-sm text-muted-foreground">{vInfo.location as string} · {vInfo.hours}</p>
-                  <p className="text-sm text-muted-foreground">{vInfo.fulfillment.join(" · ")} — sample details, not verified</p>
+                  <p className="text-sm text-muted-foreground">
+                    {vInfo.location as string} · {vInfo.hours}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {vInfo.fulfillment.join(" · ")} — sample details, not verified
+                  </p>
                 </>
               ) : null}
-              {vendorId ? <Link to="/vendors/$vendorId" params={{ vendorId }} className="w-fit text-sm underline">View vendor</Link> : null}
+              {vendorId ? (
+                <Link
+                  to="/vendors/$vendorId"
+                  params={{ vendorId }}
+                  className="w-fit text-sm underline"
+                >
+                  View vendor
+                </Link>
+              ) : null}
             </div>
           ) : null}
 
@@ -320,8 +458,14 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
                 {TASTES.map((t) => {
                   const on = picked.includes(t);
                   return (
-                    <button key={t} type="button" aria-pressed={on} onClick={() => pickTaste(t)} disabled={gesture.isPending}
-                      className={`rounded-full px-3 py-1.5 text-sm transition-colors ${on ? "bg-primary text-primary-foreground" : "border border-border bg-card hover:bg-secondary/40"}`}>
+                    <button
+                      key={t}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => pickTaste(t)}
+                      disabled={gesture.isPending}
+                      className={`rounded-full px-3 py-1.5 text-sm transition-colors ${on ? "bg-primary text-primary-foreground" : "border border-border bg-card hover:bg-secondary/40"}`}
+                    >
                       {on ? `✓ ${t}` : t}
                     </button>
                   );
@@ -334,14 +478,22 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
                     ? "Your pick is saved to FoodyPop and steers the next dishes."
                     : "Your picks steer the next dishes in this session. Sign in to save them to FoodyPop."}
               </p>
-              {gesture.isError ? <p className="text-xs text-destructive">Couldn't save your reaction. It still counts for this session.</p> : null}
+              {gesture.isError ? (
+                <p className="text-xs text-destructive">
+                  Couldn't save your reaction. It still counts for this session.
+                </p>
+              ) : null}
             </div>
           ) : null}
 
           {demo ? (
-            <p className="rounded-2xl bg-muted p-3 text-sm text-muted-foreground">Browse-only demo dish — ordering and following open once a real vendor publishes it.</p>
+            <p className="rounded-2xl bg-muted p-3 text-sm text-muted-foreground">
+              Browse-only demo dish — ordering and following open once a real vendor publishes it.
+            </p>
           ) : price !== null ? (
-            <button type="button" className="btn-primary w-fit" onClick={() => add(current)}>Add to cart</button>
+            <button type="button" className="btn-primary w-fit" onClick={() => add(current)}>
+              Add to cart
+            </button>
           ) : null}
         </div>
       </div>
