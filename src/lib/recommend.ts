@@ -6,7 +6,7 @@
  */
 import type { Dish } from "@/lib/api/types";
 import { dishEffectivePrice } from "@/lib/cart";
-import { dishCategory, dishIsDrink } from "@/lib/taxonomy";
+import { dishCategory, dishCuisine, dishIsDrink } from "@/lib/taxonomy";
 import { demoTaste } from "@/lib/demo/catalog";
 
 export type Intent = "discover" | "hungry" | "thirsty";
@@ -18,11 +18,54 @@ export interface Signals {
   /** Category name → weight (+ details/vendor opened, − skipped quickly). */
   categories: Record<string, number>;
   seen: string[];
+  /** Cuisine name → weight, same rules as categories. */
+  cuisines?: Record<string, number>;
+  /** Dish id → number of quick skips this session. */
+  skipped?: Record<string, number>;
 }
 
-export const emptySignals = (): Signals => ({ tastes: {}, categories: {}, seen: [] });
+export const emptySignals = (): Signals => ({
+  tastes: {},
+  categories: {},
+  seen: [],
+  cuisines: {},
+  skipped: {},
+});
 
 const catName = (d: Dish) => dishCategory(d)?.name ?? "";
+const cuisineName = (d: Dish) => dishCuisine(d)?.name ?? "";
+
+/** What the user did with a dish. Simple weighted rules, not machine learning. */
+export type Interaction = "quickSkip" | "details" | "vendor" | "taste" | "engagedNext";
+
+/** A skip within this many ms of the dish appearing counts as a quick skip. */
+export const QUICK_SKIP_MS = 2000;
+
+export const INTERACTION_WEIGHTS: Record<Interaction, number> = {
+  quickSkip: -0.5,
+  details: 0.3,
+  vendor: 0.3,
+  taste: 0.4,
+  engagedNext: 0.2,
+};
+
+/** Turn one interaction into session signals for the dish's category and cuisine. */
+export function recordInteraction(s: Signals, dish: Dish, kind: Interaction): void {
+  const w = INTERACTION_WEIGHTS[kind];
+  const c = catName(dish);
+  const q = cuisineName(dish);
+  s.cuisines ??= {};
+  s.skipped ??= {};
+  if (c) s.categories[c] = (s.categories[c] ?? 0) + w;
+  if (q) s.cuisines[q] = (s.cuisines[q] ?? 0) + w;
+  if (kind === "quickSkip") s.skipped[dish.id] = (s.skipped[dish.id] ?? 0) + 1;
+}
+
+/** Classify leaving a dish: quick skip, engaged next, or plain next. */
+export function classifyLeave(ms: number, interacted: boolean): Interaction | null {
+  if (interacted) return "engagedNext";
+  return ms < QUICK_SKIP_MS ? "quickSkip" : null;
+}
 
 /** Dishes the backend explicitly marks unavailable are never served. */
 export function filterAvailable(dishes: Dish[]): Dish[] {
@@ -53,6 +96,8 @@ export function scoreCandidates(
     let score = 1;
     for (const t of tastes) score += (s.tastes[t] ?? 0) * 0.8;
     score += (s.categories[catName(dish)] ?? 0) * 0.5;
+    score += (s.cuisines?.[cuisineName(dish)] ?? 0) * 0.4;
+    score -= (s.skipped?.[dish.id] ?? 0) * 1;
     const price = dishEffectivePrice(dish);
     if (intent === "hungry") {
       if (tastes.includes("Filling")) score += 1.5;
@@ -129,3 +174,22 @@ export function shouldSendTaste(isDemo: boolean, hasToken: boolean, on: boolean)
 export function markSeen(s: Signals, id: string): void {
   s.seen = [...s.seen.filter((x) => x !== id), id];
 }
+
+/**
+ * Recommendation boundary. Dish POP talks only to this interface, so a future
+ * FoodyPop recommendation service can replace the browser rule engine.
+ */
+export interface Recommender {
+  next(
+    all: Dish[],
+    opts: { intent: Intent; type: DishType; signals: Signals; currentId?: string | undefined },
+  ): Dish | null;
+  signal(s: Signals, dish: Dish, kind: Interaction): void;
+  taste(s: Signals, taste: string, on: boolean): void;
+}
+
+export const browserRecommender: Recommender = {
+  next: (all, opts) => serveNextDish(all, opts),
+  signal: recordInteraction,
+  taste: recordTaste,
+};
