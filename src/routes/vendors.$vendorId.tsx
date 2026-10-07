@@ -48,9 +48,18 @@ function VendorDetail() {
             {(v as DemoVendor).tagline} · {(v as DemoVendor).category} · {(v as DemoVendor).hours} ·{" "}
             {(v as DemoVendor).fulfillment.join(" / ")}
           </p>
-          <p className="text-xs text-muted-foreground">Demo vendor — fictional business for the demo catalog.</p>
+          <p className="text-xs text-muted-foreground">
+            Demo vendor — fictional business for the demo catalog.
+          </p>
           <h2 className="text-2xl text-foreground">Dishes</h2>
-          <DishGrid dishes={demoDishesForVendor(v.id)} isPending={false} error={null} onRetry={() => {}} emptyTitle="No dishes" emptyHint="" />
+          <DishGrid
+            dishes={demoDishesForVendor(v.id)}
+            isPending={false}
+            error={null}
+            onRetry={() => {}}
+            emptyTitle="No dishes"
+            emptyHint=""
+          />
         </>
       ) : null}
       <GapNotice title="Vendor dish listing unavailable">

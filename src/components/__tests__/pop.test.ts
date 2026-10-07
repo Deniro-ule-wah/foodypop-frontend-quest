@@ -35,7 +35,9 @@ describe("buildMediaList — Phase 3B media hardening", () => {
 
   it("deduplicates when imageUrl and mediaUrl are identical", () => {
     expect(
-      buildMediaList(mkDish({ imageUrl: "https://x.com/same.jpg", mediaUrl: "https://x.com/same.jpg" })),
+      buildMediaList(
+        mkDish({ imageUrl: "https://x.com/same.jpg", mediaUrl: "https://x.com/same.jpg" }),
+      ),
     ).toEqual(["https://x.com/same.jpg"]);
   });
 
@@ -62,9 +64,9 @@ describe("buildMediaList — Phase 3B media hardening", () => {
   });
 
   it("skips blank/whitespace-only URLs", () => {
-    expect(
-      buildMediaList(mkDish({ imageUrl: "  ", mediaUrl: "https://x.com/good.jpg" })),
-    ).toEqual(["https://x.com/good.jpg"]);
+    expect(buildMediaList(mkDish({ imageUrl: "  ", mediaUrl: "https://x.com/good.jpg" }))).toEqual([
+      "https://x.com/good.jpg",
+    ]);
   });
 
   it("respects imageUrl → mediaUrl → images[] ordering", () => {

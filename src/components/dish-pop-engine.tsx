@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getDishFeed, createGesture, TASTES } from "@/lib/api/dishes";
@@ -54,7 +54,7 @@ export function DishPopEngine({ initialIntent }: { initialIntent?: Intent }) {
     queryFn: ({ signal }) => getDishFeed({ limit: 48 }, signal),
     retry: false,
   });
-  const all = feed.data?.items ?? [];
+  const all = useMemo(() => feed.data?.items ?? [], [feed.data]);
   const [intent, setIntentState] = useState<Intent>(initialIntent ?? session.intent);
   const [type, setTypeState] = useState<DishType>(session.type);
   const [current, setCurrent] = useState<Dish | null>(null);
